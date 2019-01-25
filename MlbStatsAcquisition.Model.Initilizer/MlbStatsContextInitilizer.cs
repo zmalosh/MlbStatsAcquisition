@@ -21,6 +21,9 @@ namespace MlbStatsAcquisition.Model.Initilizer
 
 			var positionsProcessor = new Processor.Processors.PositionsProcessor();
 			positionsProcessor.Run();
+
+			var gameEventTypesProcessor = new Processor.Processors.GameEventTypesProcessor();
+			gameEventTypesProcessor.Run();
 		}
 	}
 }

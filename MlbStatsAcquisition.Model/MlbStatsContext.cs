@@ -12,6 +12,7 @@ namespace MlbStatsAcquisition.Model
 	{
 		public DbSet<Position> Positions { get; set; }
 		public DbSet<StatType> StatTypes { get; set; }
+		public DbSet<GameEventType> GameEventTypes { get; set; }
 		public DbSet<Venue> Venues { get; set; }
 
 		protected override void OnModelCreating(DbModelBuilder modelBuilder)
@@ -20,6 +21,7 @@ namespace MlbStatsAcquisition.Model
 
 			modelBuilder.Entity<Venue>().HasKey(v => v.VenueId).Property(v => v.VenueId).HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
 			modelBuilder.Entity<StatType>().HasKey(st => st.StatTypeID).Property(st => st.StatTypeID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
+			modelBuilder.Entity<GameEventType>().HasKey(t => t.GameEventTypeID).Property(t => t.GameEventTypeID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
 			modelBuilder.Entity<Position>().HasKey(p => p.PositionAbbr).Property(p => p.PositionAbbr).HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
 		}
 

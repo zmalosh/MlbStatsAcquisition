@@ -48,6 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GameEventType.cs" />
     <Compile Include="MlbStatsContext.cs" />
     <Compile Include="MlbStatsEntity.cs" />
     <Compile Include="Position.cs" />

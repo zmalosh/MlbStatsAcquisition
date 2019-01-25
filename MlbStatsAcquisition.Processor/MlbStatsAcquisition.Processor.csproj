@@ -53,9 +53,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Feeds\Converter.cs" />
+    <Compile Include="Feeds\GameEventTypesFeed.cs" />
     <Compile Include="Feeds\PositionsFeed.cs" />
     <Compile Include="Feeds\StatTypesFeed.cs" />
     <Compile Include="Feeds\VenuesFeed.cs" />
+    <Compile Include="Processors\GameEventTypesProcessor.cs" />
     <Compile Include="Processors\IProcessor.cs" />
     <Compile Include="Processors\PositionsProcessor.cs" />
     <Compile Include="Processors\StatTypesProcessor.cs" />
