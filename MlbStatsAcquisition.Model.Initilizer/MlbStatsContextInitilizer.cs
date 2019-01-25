@@ -18,6 +18,9 @@ namespace MlbStatsAcquisition.Model.Initilizer
 
 			var statTypesProcessor = new Processor.Processors.StatTypesProcessor();
 			statTypesProcessor.Run();
+
+			var positionsProcessor = new Processor.Processors.PositionsProcessor();
+			positionsProcessor.Run();
 		}
 	}
 }

@@ -53,9 +53,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Feeds\PositionsFeed.cs" />
     <Compile Include="Feeds\StatTypesFeed.cs" />
     <Compile Include="Feeds\VenuesFeed.cs" />
     <Compile Include="Processors\IProcessor.cs" />
+    <Compile Include="Processors\PositionsProcessor.cs" />
     <Compile Include="Processors\StatTypesProcessor.cs" />
     <Compile Include="Processors\VenuesProcessor.cs" />
     <Compile Include="Program.cs" />
