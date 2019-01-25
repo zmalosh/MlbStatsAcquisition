@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MlbStatsAcquisition.Model.Initilizer
 {
-	public class MlbStatsContextInitilizer : CreateDatabaseIfNotExists<MlbStatsContext>
+	public class MlbStatsContextInitilizer : DropCreateDatabaseAlways<MlbStatsContext>
 	{
 		public override void InitializeDatabase(MlbStatsContext context)
 		{

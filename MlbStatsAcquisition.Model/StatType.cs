@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace MlbStatsAcquisition.Model
 {
+	// Is* PROPERTIES REPRESENT ALL OPTIONS FROM statGroups MLB API
 	public class StatType : MlbStatsEntity
 	{
 		public int StatTypeID { get; set; }
@@ -17,5 +18,10 @@ namespace MlbStatsAcquisition.Model
 		public bool IsCatching { get; set; }
 		public bool IsPitching { get; set; }
 		public bool IsHitting { get; set; }
+		public bool IsRunning { get; set; }
+		public bool IsGame { get; set; }
+		public bool IsTeam { get; set; }
+		public bool IsStreak { get; set; }
+
 	}
 }

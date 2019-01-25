@@ -31,11 +31,21 @@ namespace MlbStatsAcquisition.Processor.Processors
 							Name = feedStatType.Name,
 							Label = feedStatType.Label,
 							IsCounting = feedStatType.IsCounting,
-							IsCatching = feedStatType.StatGroups.Any(x => string.Equals(x.Name, "Catching", StringComparison.InvariantCultureIgnoreCase)),
-							IsFielding = feedStatType.StatGroups.Any(x => string.Equals(x.Name, "Fielding", StringComparison.InvariantCultureIgnoreCase)),
-							IsHitting = feedStatType.StatGroups.Any(x => string.Equals(x.Name, "Hitting", StringComparison.InvariantCultureIgnoreCase)),
-							IsPitching = feedStatType.StatGroups.Any(x => string.Equals(x.Name, "Pitching", StringComparison.InvariantCultureIgnoreCase)),
+							IsCatching = feedStatType.StatGroups.Any(x => string.Equals(x.Name, "catching", StringComparison.InvariantCultureIgnoreCase)),
+							IsFielding = feedStatType.StatGroups.Any(x => string.Equals(x.Name, "fielding", StringComparison.InvariantCultureIgnoreCase)),
+							IsHitting = feedStatType.StatGroups.Any(x => string.Equals(x.Name, "hitting", StringComparison.InvariantCultureIgnoreCase)),
+							IsPitching = feedStatType.StatGroups.Any(x => string.Equals(x.Name, "pitching", StringComparison.InvariantCultureIgnoreCase)),
+							IsRunning = feedStatType.StatGroups.Any(x => string.Equals(x.Name, "running", StringComparison.InvariantCultureIgnoreCase)),
+							IsTeam = feedStatType.StatGroups.Any(x => string.Equals(x.Name, "team", StringComparison.InvariantCultureIgnoreCase)),
+							IsGame = feedStatType.StatGroups.Any(x => string.Equals(x.Name, "game", StringComparison.InvariantCultureIgnoreCase)),
+							IsStreak = feedStatType.StatGroups.Any(x => string.Equals(x.Name, "streak", StringComparison.InvariantCultureIgnoreCase)),
 						};
+
+						if (feedStatType.StatGroups.Any(x => !dbStatType.IsCatching && !dbStatType.IsFielding && !dbStatType.IsHitting && !dbStatType.IsPitching
+																&& !dbStatType.IsRunning && !dbStatType.IsTeam && !dbStatType.IsGame && !dbStatType.IsStreak))
+						{
+							throw new ArgumentException("STATIS A STAT FOR NOTHINGNESS?!");
+						}
 						dbStatTypes.Add(dbStatType.Lookup, dbStatType);
 						context.StatTypes.Add(dbStatType);
 					}
