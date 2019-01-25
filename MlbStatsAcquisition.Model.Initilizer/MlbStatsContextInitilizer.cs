@@ -36,6 +36,9 @@ namespace MlbStatsAcquisition.Model.Initilizer
 
 			var jobTypesProcessor = new Processor.Processors.JobTypesProcessor();
 			jobTypesProcessor.Run();
+
+			var pitchResultTypesProcessor = new Processor.Processors.PitchResultTypesProcessor();
+			pitchResultTypesProcessor.Run();
 		}
 	}
 }

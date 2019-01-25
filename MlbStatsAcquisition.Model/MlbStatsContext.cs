@@ -17,6 +17,7 @@ namespace MlbStatsAcquisition.Model
 		public DbSet<GameType> GameTypes { get; set; }
 		public DbSet<HitTrajectoryType> HitTrajectoryTypes { get; set; }
 		public DbSet<JobType> JobTypes { get; set; }
+		public DbSet<PitchResultType> PitchResultTypes { get; set; }
 		public DbSet<Venue> Venues { get; set; }
 
 		protected override void OnModelCreating(DbModelBuilder modelBuilder)
@@ -27,6 +28,7 @@ namespace MlbStatsAcquisition.Model
 			modelBuilder.Entity<GameEventType>().HasKey(t => t.GameEventTypeID).Property(t => t.GameEventTypeID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
 			modelBuilder.Entity<GameStatusType>().HasKey(t => t.GameStatusTypeID).Property(t => t.GameStatusTypeID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
 			modelBuilder.Entity<HitTrajectoryType>().HasKey(t => t.HitTrajectoryTypeID).Property(t => t.HitTrajectoryTypeID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
+			modelBuilder.Entity<PitchResultType>().HasKey(t => t.PitchResultTypeID).Property(t => t.PitchResultTypeID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
 			modelBuilder.Entity<JobType>().HasKey(t => t.JobTypeID).Property(t => t.JobTypeID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
 			modelBuilder.Entity<Position>().HasKey(p => p.PositionAbbr).Property(p => p.PositionAbbr).HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
 
