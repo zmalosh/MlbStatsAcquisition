@@ -52,6 +52,7 @@
     <Compile Include="GameStatusType.cs" />
     <Compile Include="GameType.cs" />
     <Compile Include="HitTrajectoryType.cs" />
+    <Compile Include="JobType.cs" />
     <Compile Include="MlbStatsContext.cs" />
     <Compile Include="MlbStatsEntity.cs" />
     <Compile Include="Position.cs" />

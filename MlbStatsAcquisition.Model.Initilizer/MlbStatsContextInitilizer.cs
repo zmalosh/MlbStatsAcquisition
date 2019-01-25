@@ -33,6 +33,9 @@ namespace MlbStatsAcquisition.Model.Initilizer
 
 			var hitTrajectoryTypesProcessor = new Processor.Processors.HitTrajectoryTypesProcessor();
 			hitTrajectoryTypesProcessor.Run();
+
+			var jobTypesProcessor = new Processor.Processors.JobTypesProcessor();
+			jobTypesProcessor.Run();
 		}
 	}
 }
