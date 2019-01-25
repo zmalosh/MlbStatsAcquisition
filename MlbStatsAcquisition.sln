@@ -5,6 +5,10 @@ VisualStudioVersion = 15.0.28307.168
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MlbStatsAcquisition.Processor", "MlbStatsAcquisition.Processor\MlbStatsAcquisition.Processor.csproj", "{72AF8E94-E3A4-40F1-BB5B-2D62ABE34D31}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MlbStatsAcquisition.Model.Initilizer", "MlbStatsAcquisition.Model.Initilizer\MlbStatsAcquisition.Model.Initilizer.csproj", "{231B5A22-E418-453E-9DD2-238B9F7B4AC3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MlbStatsAcquisition.Model", "MlbStatsAcquisition.Model\MlbStatsAcquisition.Model.csproj", "{702F11E7-3030-4C09-A4BB-0B4EE88C07A4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{72AF8E94-E3A4-40F1-BB5B-2D62ABE34D31}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{72AF8E94-E3A4-40F1-BB5B-2D62ABE34D31}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{72AF8E94-E3A4-40F1-BB5B-2D62ABE34D31}.Release|Any CPU.Build.0 = Release|Any CPU
+		{231B5A22-E418-453E-9DD2-238B9F7B4AC3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{231B5A22-E418-453E-9DD2-238B9F7B4AC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{231B5A22-E418-453E-9DD2-238B9F7B4AC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{231B5A22-E418-453E-9DD2-238B9F7B4AC3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{702F11E7-3030-4C09-A4BB-0B4EE88C07A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{702F11E7-3030-4C09-A4BB-0B4EE88C07A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{702F11E7-3030-4C09-A4BB-0B4EE88C07A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{702F11E7-3030-4C09-A4BB-0B4EE88C07A4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

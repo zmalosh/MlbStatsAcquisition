@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{72AF8E94-E3A4-40F1-BB5B-2D62ABE34D31}</ProjectGuid>
+    <ProjectGuid>{231B5A22-E418-453E-9DD2-238B9F7B4AC3}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>MlbStatsAcquisition.Processor</RootNamespace>
-    <AssemblyName>MlbStatsAcquisition.Processor</AssemblyName>
+    <RootNamespace>MlbStatsAcquisition.Model.Initilizer</RootNamespace>
+    <AssemblyName>MlbStatsAcquisition.Model.Initilizer</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -39,9 +39,6 @@
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.12.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
@@ -53,8 +50,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Feeds\VenuesFeed.cs" />
-    <Compile Include="Processors\VenuesProcessor.cs" />
+    <Compile Include="MlbStatsContextInitilizer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -66,6 +62,10 @@
     <ProjectReference Include="..\MlbStatsAcquisition.Model\MlbStatsAcquisition.Model.csproj">
       <Project>{702f11e7-3030-4c09-a4bb-0b4ee88c07a4}</Project>
       <Name>MlbStatsAcquisition.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MlbStatsAcquisition.Processor\MlbStatsAcquisition.Processor.csproj">
+      <Project>{72af8e94-e3a4-40f1-bb5b-2d62abe34d31}</Project>
+      <Name>MlbStatsAcquisition.Processor</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
