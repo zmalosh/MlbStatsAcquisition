@@ -55,10 +55,15 @@
   <ItemGroup>
     <Compile Include="Feeds\Converter.cs" />
     <Compile Include="Feeds\GameEventTypesFeed.cs" />
+    <Compile Include="Feeds\GameStatusTypesFeed.cs" />
+    <Compile Include="Feeds\GameTypesFeed.cs" />
+    <Compile Include="Feeds\HitTrajectoriesFeed.cs" />
     <Compile Include="Feeds\PositionsFeed.cs" />
     <Compile Include="Feeds\StatTypesFeed.cs" />
     <Compile Include="Feeds\VenuesFeed.cs" />
     <Compile Include="Processors\GameEventTypesProcessor.cs" />
+    <Compile Include="Processors\GameStatusTypesProcessor.cs" />
+    <Compile Include="Processors\HitTrajectoryTypesProcessor.cs" />
     <Compile Include="Processors\IProcessor.cs" />
     <Compile Include="Processors\PositionsProcessor.cs" />
     <Compile Include="Processors\StatTypesProcessor.cs" />
@@ -69,6 +74,7 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+    <Compile Include="Processors\GameTypesProcessor.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MlbStatsAcquisition.Model\MlbStatsAcquisition.Model.csproj">

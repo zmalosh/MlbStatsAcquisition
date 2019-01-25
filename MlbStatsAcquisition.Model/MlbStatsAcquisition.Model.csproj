@@ -49,6 +49,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GameEventType.cs" />
+    <Compile Include="GameStatusType.cs" />
+    <Compile Include="GameType.cs" />
+    <Compile Include="HitTrajectoryType.cs" />
     <Compile Include="MlbStatsContext.cs" />
     <Compile Include="MlbStatsEntity.cs" />
     <Compile Include="Position.cs" />
