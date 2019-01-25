@@ -59,6 +59,7 @@
     <Compile Include="PitchType.cs" />
     <Compile Include="Position.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReviewReasonType.cs" />
     <Compile Include="StatType.cs" />
     <Compile Include="Venue.cs" />
   </ItemGroup>

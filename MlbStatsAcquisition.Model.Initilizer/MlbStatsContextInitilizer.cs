@@ -24,6 +24,7 @@ namespace MlbStatsAcquisition.Model.Initilizer
 				 new Processor.Processors.HitTrajectoryTypesProcessor(),
 				 new Processor.Processors.JobTypesProcessor(),
 				 new Processor.Processors.PitchResultTypesProcessor(),
+				 new Processor.Processors.ReviewReasonTypesProcessor()
 			};
 
 			foreach (var processor in processors)
