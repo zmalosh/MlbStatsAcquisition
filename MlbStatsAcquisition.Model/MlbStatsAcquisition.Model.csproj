@@ -51,6 +51,7 @@
     <Compile Include="MlbStatsContext.cs" />
     <Compile Include="MlbStatsEntity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StatType.cs" />
     <Compile Include="Venue.cs" />
   </ItemGroup>
   <ItemGroup>

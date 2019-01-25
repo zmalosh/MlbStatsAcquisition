@@ -41,7 +41,7 @@ namespace MlbStatsAcquisition.Processor.Feeds
 			};
 		}
 	}
-	internal static partial class Serialize
+	public static partial class Serialize
 	{
 		public static string ToJson(this VenuesFeed self) => JsonConvert.SerializeObject(self, VenuesFeed.Converter.Settings);
 	}
