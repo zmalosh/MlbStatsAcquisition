@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MlbStatsAcquisition.Processor.Processors
 {
-	public class HitTrajectoryTypesProcessor
+	public class HitTrajectoryTypesProcessor : IProcessor
 	{
 		public void Run()
 		{

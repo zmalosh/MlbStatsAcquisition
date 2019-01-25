@@ -13,32 +13,23 @@ namespace MlbStatsAcquisition.Model.Initilizer
 		{
 			base.InitializeDatabase(context);
 
-			var venuesProcessor = new Processor.Processors.VenuesProcessor();
-			venuesProcessor.Run();
+			var processors = new List<Processor.Processors.IProcessor>
+			{
+				 new Processor.Processors.VenuesProcessor(),
+				 new Processor.Processors.StatTypesProcessor(),
+				 new Processor.Processors.PositionsProcessor(),
+				 new Processor.Processors.GameEventTypesProcessor(),
+				 new Processor.Processors.GameStatusTypesProcessor(),
+				 new Processor.Processors.GameTypesProcessor(),
+				 new Processor.Processors.HitTrajectoryTypesProcessor(),
+				 new Processor.Processors.JobTypesProcessor(),
+				 new Processor.Processors.PitchResultTypesProcessor(),
+			};
 
-			var statTypesProcessor = new Processor.Processors.StatTypesProcessor();
-			statTypesProcessor.Run();
-
-			var positionsProcessor = new Processor.Processors.PositionsProcessor();
-			positionsProcessor.Run();
-
-			var gameEventTypesProcessor = new Processor.Processors.GameEventTypesProcessor();
-			gameEventTypesProcessor.Run();
-
-			var gameStatusTypesProcessor = new Processor.Processors.GameStatusTypesProcessor();
-			gameStatusTypesProcessor.Run();
-
-			var gameTypesProcessor = new Processor.Processors.GameTypesProcessor();
-			gameTypesProcessor.Run();
-
-			var hitTrajectoryTypesProcessor = new Processor.Processors.HitTrajectoryTypesProcessor();
-			hitTrajectoryTypesProcessor.Run();
-
-			var jobTypesProcessor = new Processor.Processors.JobTypesProcessor();
-			jobTypesProcessor.Run();
-
-			var pitchResultTypesProcessor = new Processor.Processors.PitchResultTypesProcessor();
-			pitchResultTypesProcessor.Run();
+			foreach (var processor in processors)
+			{
+				processor.Run();
+			}
 		}
 	}
 }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MlbStatsAcquisition.Processor.Processors
 {
-	public class JobTypesProcessor
+	public class JobTypesProcessor : IProcessor
 	{
 		public void Run()
 		{
