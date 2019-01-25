@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MlbStatsAcquisition.Processor.Feeds
 {
-	// CALLED baseballStats BY MLB
+	// CALLED baseballStats BY MLB... statTypes TO BE CALLED StatClassifications IF INCLUDED.
 	public class StatTypesFeed
 	{
 		public static string GetFeedUrl()
