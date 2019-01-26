@@ -63,9 +63,11 @@
     <Compile Include="Feeds\PitchTypesFeed.cs" />
     <Compile Include="Feeds\PositionsFeed.cs" />
     <Compile Include="Feeds\ReviewReasonTypesFeed.cs" />
+    <Compile Include="Feeds\GameSituationTypesFeed.cs" />
     <Compile Include="Feeds\StatTypesFeed.cs" />
     <Compile Include="Feeds\VenuesFeed.cs" />
     <Compile Include="Processors\GameEventTypesProcessor.cs" />
+    <Compile Include="Processors\GameSituationTypesProcessor.cs" />
     <Compile Include="Processors\GameStatusTypesProcessor.cs" />
     <Compile Include="Processors\HitTrajectoryTypesProcessor.cs" />
     <Compile Include="Processors\IProcessor.cs" />
