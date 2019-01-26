@@ -45,6 +45,7 @@ namespace MlbStatsAcquisition.Processor.Processors
 					; // TODO: ADD NO-CHANGE VALIDATION LOGIC
 				}
 			}
+			context.SaveChanges();
 		}
 	}
 }

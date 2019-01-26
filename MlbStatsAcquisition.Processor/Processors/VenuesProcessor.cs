@@ -39,6 +39,7 @@ namespace MlbStatsAcquisition.Processor.Processors
 					dbVenue.VenueName = feedVenue.Name;
 				}
 			}
+			context.SaveChanges();
 		}
 	}
 }

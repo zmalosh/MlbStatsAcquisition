@@ -46,6 +46,7 @@ namespace MlbStatsAcquisition.Processor.Processors
 					}
 				}
 			}
+			context.SaveChanges();
 		}
 	}
 }

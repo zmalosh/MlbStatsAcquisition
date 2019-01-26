@@ -53,6 +53,7 @@ namespace MlbStatsAcquisition.Processor.Processors
 					; // TODO: PUT ADJUSTMENT CODE HERE TO VERIFY NO CHANGES HAVE HAPPENED
 				}
 			}
+			context.SaveChanges();
 		}
 	}
 }
