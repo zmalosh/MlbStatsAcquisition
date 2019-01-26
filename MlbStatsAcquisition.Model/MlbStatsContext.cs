@@ -24,7 +24,12 @@ namespace MlbStatsAcquisition.Model
 		public DbSet<SkyType> SkyTypes { get; set; }
 		public DbSet<StandingsType> StandingsTypes { get; set; }
 		public DbSet<WindType> WindTypes { get; set; }
+
 		public DbSet<Venue> Venues { get; set; }
+		public DbSet<Association> Associations { get; set; }
+		public DbSet<League> Leagues { get; set; }
+		public DbSet<Division> Divisions { get; set; }
+		public DbSet<Team> Teams { get; set; }
 
 		protected override void OnModelCreating(DbModelBuilder modelBuilder)
 		{
@@ -43,10 +48,25 @@ namespace MlbStatsAcquisition.Model
 			modelBuilder.Entity<StandingsType>().HasKey(t => t.StandingsTypeID).Property(t => t.StandingsTypeID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
 			modelBuilder.Entity<ReviewReasonType>().HasKey(t => t.ReviewReasonTypeID).Property(t => t.ReviewReasonTypeID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
 			modelBuilder.Entity<Position>().HasKey(p => p.PositionAbbr).Property(p => p.PositionAbbr).HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
-
 			modelBuilder.Entity<GameType>().HasKey(t => t.GameTypeID).Property(t => t.GameTypeID).HasMaxLength(1).HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
 
-			modelBuilder.Entity<Venue>().HasKey(v => v.VenueId).Property(v => v.VenueId).HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
+			modelBuilder.Entity<Venue>().HasKey(v => v.VenueID).Property(v => v.VenueID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
+
+			modelBuilder.Entity<Association>().HasKey(a => a.AssociationID).Property(a => a.AssociationID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
+
+			modelBuilder.Entity<League>().HasKey(lg => lg.LeagueID).Property(lg => lg.LeagueID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
+			modelBuilder.Entity<League>().HasRequired(lg => lg.Association).WithMany(a => a.Leagues).HasForeignKey(lg => lg.AssociationID).WillCascadeOnDelete(false);
+
+			modelBuilder.Entity<Division>().HasKey(d => d.DivisionID).Property(d => d.DivisionID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
+			modelBuilder.Entity<Division>().HasRequired(d => d.League).WithMany(lg => lg.Divisions).HasForeignKey(d => d.LeagueID).WillCascadeOnDelete(false);
+
+			modelBuilder.Entity<Team>().HasKey(t => t.TeamID).Property(t => t.TeamID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
+			modelBuilder.Entity<Team>().HasOptional(t => t.Association).WithMany(a => a.Teams).HasForeignKey(t => t.AssociationID).WillCascadeOnDelete(false);
+			modelBuilder.Entity<Team>().HasOptional(t => t.League).WithMany(lg => lg.Teams).HasForeignKey(t => t.LeagueID).WillCascadeOnDelete(false);
+			modelBuilder.Entity<Team>().HasOptional(t => t.Division).WithMany(lg => lg.Teams).HasForeignKey(t => t.DivisionID).WillCascadeOnDelete(false);
+			modelBuilder.Entity<Team>().HasOptional(t => t.Venue).WithMany(lg => lg.CurrentTeams).HasForeignKey(t => t.VenueID).WillCascadeOnDelete(false);
+			modelBuilder.Entity<Team>().HasOptional(t => t.SpringLeague).WithMany(t => t.SpringTeams).HasForeignKey(t => t.SpringLeagueID).WillCascadeOnDelete(false);
+			modelBuilder.Entity<Team>().HasOptional(t => t.ParentOrg).WithMany(t => t.ChildTeams).HasForeignKey(t => t.ParentOrgID).WillCascadeOnDelete(false);
 		}
 
 		public override int SaveChanges()
