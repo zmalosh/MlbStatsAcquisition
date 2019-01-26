@@ -33,5 +33,7 @@ namespace MlbStatsAcquisition.Model
 		public virtual Team ParentOrg { get; set; }
 		public virtual ICollection<Team> ChildOrgTeams { get; set; }
 		public virtual ICollection<TeamSeason> TeamSeasons { get; set; }
+		public virtual ICollection<Game> AwayGames { get; set; }
+		public virtual ICollection<Game> HomeGames { get; set; }
 	}
 }

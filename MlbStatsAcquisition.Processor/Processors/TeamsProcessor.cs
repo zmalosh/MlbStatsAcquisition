@@ -21,6 +21,8 @@ namespace MlbStatsAcquisition.Processor.Processors
 
 		public void Run(Model.MlbStatsContext context)
 		{
+			Console.WriteLine($"TeamsProcessor - {this.Season}");
+
 			Feeds.TeamsFeed feed;
 			using (var client = new WebClient())
 			{

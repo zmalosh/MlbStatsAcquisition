@@ -37,6 +37,8 @@ namespace MlbStatsAcquisition.Model
 		public DbSet<DivisionSeason> DivisionSeasons { get; set; }
 		public DbSet<TeamSeason> TeamSeasons { get; set; }
 
+		public DbSet<Game> Games { get; set; }
+
 		protected override void OnModelCreating(DbModelBuilder modelBuilder)
 		{
 			base.OnModelCreating(modelBuilder);
@@ -96,6 +98,16 @@ namespace MlbStatsAcquisition.Model
 			modelBuilder.Entity<TeamSeason>().HasOptional(ts => ts.SpringLeagueSeason).WithMany(t => t.SpringTeamSeasons).HasForeignKey(ts => new { ts.SpringLeagueID, ts.Season }).WillCascadeOnDelete(false);
 			modelBuilder.Entity<TeamSeason>().HasOptional(ts => ts.ParentOrgSeason).WithMany(t => t.ChildOrgSeasons).HasForeignKey(ts => new { ts.ParentOrgID, ts.Season }).WillCascadeOnDelete(false);
 			modelBuilder.Entity<TeamSeason>().HasOptional(ts => ts.VenueSeason).WithMany(v => v.TeamSeasons).HasForeignKey(ts => new { ts.VenueID, ts.Season }).WillCascadeOnDelete(false);
+
+			modelBuilder.Entity<Game>().HasKey(g => g.GameID).Property(g => g.GameID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
+			modelBuilder.Entity<Game>().HasRequired(g => g.Association).WithMany(a => a.Games).HasForeignKey(g => g.AssociationID).WillCascadeOnDelete(false);
+			modelBuilder.Entity<Game>().HasOptional(g => g.HomeTeam).WithMany(t => t.HomeGames).HasForeignKey(g => g.HomeTeamID).WillCascadeOnDelete(false);
+			modelBuilder.Entity<Game>().HasOptional(g => g.AwayTeam).WithMany(t => t.AwayGames).HasForeignKey(g => g.AwayTeamID).WillCascadeOnDelete(false);
+			modelBuilder.Entity<Game>().HasOptional(g => g.Venue).WithMany(v => v.Games).HasForeignKey(g => g.VenueID).WillCascadeOnDelete(false);
+			modelBuilder.Entity<Game>().HasRequired(g => g.AssociationSeason).WithMany(a => a.Games).HasForeignKey(g => new { g.AssociationID, g.Season }).WillCascadeOnDelete(false);
+			modelBuilder.Entity<Game>().HasOptional(g => g.HomeTeamSeason).WithMany(t => t.HomeGames).HasForeignKey(g => new { g.HomeTeamID, g.Season }).WillCascadeOnDelete(false);
+			modelBuilder.Entity<Game>().HasOptional(g => g.AwayTeamSeason).WithMany(t => t.AwayGames).HasForeignKey(g => new { g.AwayTeamID, g.Season }).WillCascadeOnDelete(false);
+			modelBuilder.Entity<Game>().HasOptional(g => g.VenueSeason).WithMany(v => v.Games).HasForeignKey(g => new { g.VenueID, g.Season }).WillCascadeOnDelete(false);
 		}
 
 		public override int SaveChanges()

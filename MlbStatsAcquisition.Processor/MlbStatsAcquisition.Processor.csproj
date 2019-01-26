@@ -53,6 +53,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Feeds\GameScheduleFeed.cs" />
     <Compile Include="Feeds\StandingsTypesFeed.cs" />
     <Compile Include="Feeds\Converter.cs" />
     <Compile Include="Feeds\GameEventTypesFeed.cs" />
@@ -70,6 +71,7 @@
     <Compile Include="Feeds\TeamsFeed.cs" />
     <Compile Include="Feeds\VenuesFeed.cs" />
     <Compile Include="Feeds\WindTypesFeed.cs" />
+    <Compile Include="Processors\GameScheduleProcessor.cs" />
     <Compile Include="Processors\GameEventTypesProcessor.cs" />
     <Compile Include="Processors\GameSituationTypesProcessor.cs" />
     <Compile Include="Processors\GameStatusTypesProcessor.cs" />

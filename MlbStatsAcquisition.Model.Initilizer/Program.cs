@@ -52,6 +52,18 @@ namespace MlbStatsAcquisition.Model.Initilizer
 				{
 					processor.Run(context);
 				}
+
+				// GAMES NOT ABLE TO BE PARSED UNTIL Associations (AKA SPORTS) AND ASSOCIATED Seasons FEEDS ARE PROCESSED
+				//var associationIds = context.Associations.Select(x => x.AssociationID).ToList();
+				//processors = new List<Processor.Processors.IProcessor>();
+				//for (int i = 2019; i >= 1901; i--)
+				//{
+				//	processors.Add(new Processor.Processors.GameScheduleProcessor(i, associationIds));
+				//}
+				//foreach (var processor in processors)
+				//{
+				//	processor.Run(context);
+				//}
 			}
 		}
 	}

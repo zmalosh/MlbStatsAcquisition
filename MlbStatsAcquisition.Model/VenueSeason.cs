@@ -14,5 +14,6 @@ namespace MlbStatsAcquisition.Model
 
 		public virtual Venue Venue { get; set; }
 		public virtual ICollection<TeamSeason> TeamSeasons { get; set; }
+		public virtual ICollection<Game> Games { get; set; }
 	}
 }

@@ -52,6 +52,7 @@
     <Compile Include="AssociationSeason.cs" />
     <Compile Include="Division.cs" />
     <Compile Include="DivisionSeason.cs" />
+    <Compile Include="Game.cs" />
     <Compile Include="League.cs" />
     <Compile Include="GameEventType.cs" />
     <Compile Include="GameStatusType.cs" />
