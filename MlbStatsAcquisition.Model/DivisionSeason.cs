@@ -6,15 +6,15 @@ using System.Threading.Tasks;
 
 namespace MlbStatsAcquisition.Model
 {
-	public class Division : MlbStatsEntity
+	public class DivisionSeason : MlbStatsEntity
 	{
 		public int DivisionID { get; set; }
+		public int Season { get; set; }
 		public string DivisionName { get; set; }
-		public string DivisionLink { get; set; }
 		public int LeagueID { get; set; }
 
-		public virtual League League { get; set; }
-		public virtual ICollection<Team> Teams { get; set; }
-		public virtual ICollection<DivisionSeason> DivisionSeasons { get; set; }
+		public virtual Division Division { get; set; }
+		public virtual LeagueSeason LeagueSeason { get; set; }
+		public virtual ICollection<TeamSeason> TeamSeasons { get; set; }
 	}
 }

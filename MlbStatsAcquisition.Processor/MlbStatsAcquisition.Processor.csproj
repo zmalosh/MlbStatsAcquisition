@@ -83,7 +83,7 @@
     <Compile Include="Processors\SkyTypesProcessor.cs" />
     <Compile Include="Processors\StandingsTypesProcessor.cs" />
     <Compile Include="Processors\StatTypesProcessor.cs" />
-    <Compile Include="Processors\CurrentTeamsProcessor.cs" />
+    <Compile Include="Processors\TeamsProcessor.cs" />
     <Compile Include="Processors\VenuesProcessor.cs" />
     <Compile Include="Processors\WindTypesProcessor.cs" />
     <Compile Include="Program.cs" />

@@ -1,19 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace MlbStatsAcquisition.Model
 {
-	public class Venue : MlbStatsEntity
+	public class VenueSeason
 	{
 		public int VenueID { get; set; }
+		public int Season { get; set; }
 		public string VenueName { get; set; }
-		public string VenueLink { get; set; }
 
-		public ICollection<Team> Teams { get; set; }
-		public ICollection<VenueSeason> VenueSeasons { get; set; }
+		public virtual Venue Venue { get; set; }
+		public virtual ICollection<TeamSeason> TeamSeasons { get; set; }
 	}
 }

@@ -12,26 +12,30 @@ namespace MlbStatsAcquisition.Model.Initilizer
 		{
 			using (var context = new MlbStatsContext())
 			{
+				context.Configuration.AutoDetectChangesEnabled = false;
+
 				var init = new MlbStatsContextInitilizer();
 				init.InitializeDatabase(context);
 
-				var processors = new List<Processor.Processors.IProcessor>
+				List<Processor.Processors.IProcessor> processors;
+
+				processors = new List<Processor.Processors.IProcessor>
 				{
-					 new Processor.Processors.VenuesProcessor(),
-					 new Processor.Processors.StatTypesProcessor(),
-					 new Processor.Processors.PositionsProcessor(),
-					 new Processor.Processors.GameEventTypesProcessor(),
-					 new Processor.Processors.GameStatusTypesProcessor(),
-					 new Processor.Processors.GameTypesProcessor(),
-					 new Processor.Processors.HitTrajectoryTypesProcessor(),
-					 new Processor.Processors.JobTypesProcessor(),
-					 new Processor.Processors.PitchResultTypesProcessor(),
-					 new Processor.Processors.PitchTypesProcessor(),
-					 new Processor.Processors.ReviewReasonTypesProcessor(),
-					 new Processor.Processors.GameSituationTypesProcessor(),
-					 new Processor.Processors.SkyTypesProcessor(),
-					 new Processor.Processors.WindTypesProcessor(),
-					 new Processor.Processors.StandingsTypesProcessor()
+					new Processor.Processors.VenuesProcessor(),
+					new Processor.Processors.StatTypesProcessor(),
+					new Processor.Processors.PositionsProcessor(),
+					new Processor.Processors.GameEventTypesProcessor(),
+					new Processor.Processors.GameStatusTypesProcessor(),
+					new Processor.Processors.GameTypesProcessor(),
+					new Processor.Processors.HitTrajectoryTypesProcessor(),
+					new Processor.Processors.JobTypesProcessor(),
+					new Processor.Processors.PitchResultTypesProcessor(),
+					new Processor.Processors.PitchTypesProcessor(),
+					new Processor.Processors.ReviewReasonTypesProcessor(),
+					new Processor.Processors.GameSituationTypesProcessor(),
+					new Processor.Processors.SkyTypesProcessor(),
+					new Processor.Processors.WindTypesProcessor(),
+					new Processor.Processors.StandingsTypesProcessor()
 				};
 
 				foreach (var processor in processors)
@@ -39,8 +43,15 @@ namespace MlbStatsAcquisition.Model.Initilizer
 					processor.Run(context);
 				}
 
-				var currentTeamsProcessor = new Processor.Processors.CurrentTeamsProcessor();
-				currentTeamsProcessor.Run(context);
+				processors = new List<Processor.Processors.IProcessor>();
+				for (int i = 2019; i >= 1901; i--)
+				{
+					processors.Add(new Processor.Processors.TeamsProcessor(i));
+				}
+				foreach (var processor in processors)
+				{
+					processor.Run(context);
+				}
 			}
 		}
 	}

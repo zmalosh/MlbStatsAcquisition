@@ -7,14 +7,24 @@ using System.Threading.Tasks;
 
 namespace MlbStatsAcquisition.Processor.Processors
 {
-	public class CurrentTeamsProcessor : IProcessor
+	public class TeamsProcessor : IProcessor
 	{
+		private int Season { get; set; }
+		private bool IsCurrentSeason { get; set; }
+
+		public TeamsProcessor(int? season = null)
+		{
+			int currentSeason = DateTime.Now.Year;
+			this.Season = season ?? currentSeason;
+			this.IsCurrentSeason = this.Season == currentSeason;
+		}
+
 		public void Run(Model.MlbStatsContext context)
 		{
 			Feeds.TeamsFeed feed;
 			using (var client = new WebClient())
 			{
-				var url = Feeds.TeamsFeed.GetFeedUrl();
+				var url = Feeds.TeamsFeed.GetFeedUrl(this.Season);
 				var rawJson = client.DownloadString(url);
 				feed = Feeds.TeamsFeed.FromJson(rawJson);
 			}
@@ -24,6 +34,12 @@ namespace MlbStatsAcquisition.Processor.Processors
 			var dbDivisions = context.Divisions.ToDictionary(x => x.DivisionID);
 			var dbVenues = context.Venues.ToDictionary(x => x.VenueID);
 			var dbTeams = context.Teams.ToDictionary(x => x.TeamID);
+
+			var dbVenueSeasons = context.VenueSeasons.Where(x => x.Season == this.Season).ToDictionary(x => x.VenueID);
+			var dbAssociationSeasons = context.AssociationSeasons.Where(x => x.Season == this.Season).ToDictionary(y => y.AssociationID);
+			var dbLeagueSeasons = context.LeagueSeasons.Where(x => x.Season == this.Season).ToDictionary(y => y.LeagueID);
+			var dbDivisionSeasons = context.DivisionSeasons.Where(x => x.Season == this.Season).ToDictionary(y => y.DivisionID);
+			var dbTeamSeasons = context.TeamSeasons.Where(x => x.Season == this.Season).ToDictionary(y => y.TeamID);
 
 			var feedTeams = feed.Teams.OrderBy(x => x.ParentOrgId.HasValue ? 1 : 0).ThenBy(y => y.Sport.Id).ToList();
 
@@ -132,7 +148,7 @@ namespace MlbStatsAcquisition.Processor.Processors
 					dbTeams.Add(dbTeam.TeamID, dbTeam);
 					context.Teams.Add(dbTeam);
 				}
-				else
+				else if (this.IsCurrentSeason) // ONLY UPDATE TEAM ENTRY IF IT IS THE CURRENT SEASON
 				{
 					if (dbTeam.FileCode != feedTeam.FileCode ||
 						dbTeam.FirstSeason != feedTeam.FirstYearOfPlay ||
@@ -209,7 +225,118 @@ namespace MlbStatsAcquisition.Processor.Processors
 						dbTeam.SpringLeague = dbSpringLeague;
 					}
 				}
+
+				// ENTER SEASON BASED PROCESSING. CURRENT DATA CAN BE UPDATED ABOVE. SEASON BASED DATA SHOULD NEVER NEED TO BE UPDATED (FOR LEAGUE STRUCTURE)
+
+				Model.VenueSeason dbVenueSeason = null;
+				if (feedTeam.Venue?.Id != null && !dbVenueSeasons.TryGetValue(feedTeam.Venue.Id.Value, out dbVenueSeason))
+				{
+					dbVenueSeason = new Model.VenueSeason
+					{
+						VenueID = feedTeam.Venue.Id.Value,
+						Season = this.Season,
+						VenueName = feedTeam.Venue.Name
+					};
+					dbVenueSeasons.Add(feedTeam.Venue.Id.Value, dbVenueSeason);
+					context.VenueSeasons.Add(dbVenueSeason);
+				}
+
+				if (!dbAssociationSeasons.TryGetValue(feedTeam.Sport.Id.Value, out Model.AssociationSeason dbAssociationSeason))
+				{
+					dbAssociationSeason = new Model.AssociationSeason
+					{
+						Association = dbAssociation,
+						Season = this.Season,
+						AssociationName = feedTeam.Sport.Name
+					};
+					dbAssociationSeasons.Add(dbAssociation.AssociationID, dbAssociationSeason);
+					context.AssociationSeasons.Add(dbAssociationSeason);
+				}
+
+				Model.LeagueSeason dbLeagueSeason = null;
+				if (feedTeam.League?.Id != null && !dbLeagueSeasons.TryGetValue(feedTeam.League.Id.Value, out dbLeagueSeason))
+				{
+					dbLeagueSeason = new Model.LeagueSeason
+					{
+						League = dbLeague,
+						Season = this.Season,
+						LeagueName = feedTeam.League.Name,
+						AssociationSeason = dbAssociationSeason
+					};
+					dbLeagueSeasons.Add(dbLeague.LeagueID, dbLeagueSeason);
+					context.LeagueSeasons.Add(dbLeagueSeason);
+				}
+
+				Model.LeagueSeason dbSpringLeagueSeason = null;
+				if (feedTeam.SpringLeague?.Id != null && !dbLeagueSeasons.TryGetValue(feedTeam.SpringLeague.Id.Value, out dbSpringLeagueSeason))
+				{
+					dbSpringLeagueSeason = new Model.LeagueSeason
+					{
+						League = dbSpringLeague,
+						Season = this.Season,
+						LeagueName = feedTeam.SpringLeague.Name,
+						AssociationSeason = dbAssociationSeason
+					};
+					dbLeagueSeasons.Add(dbSpringLeague.LeagueID, dbSpringLeagueSeason);
+					context.LeagueSeasons.Add(dbSpringLeagueSeason);
+				}
+
+				Model.DivisionSeason dbDivisionSeason = null;
+				if (feedTeam.Division?.Id != null && !dbDivisionSeasons.TryGetValue(feedTeam.Division.Id.Value, out dbDivisionSeason))
+				{
+					dbDivisionSeason = new Model.DivisionSeason
+					{
+						Division = dbDivision,
+						Season = this.Season,
+						DivisionName = feedTeam.Division.Name,
+						LeagueSeason = dbLeagueSeason
+					};
+					dbDivisionSeasons.Add(dbDivision.DivisionID, dbDivisionSeason);
+					context.DivisionSeasons.Add(dbDivisionSeason);
+				}
+
+				Model.TeamSeason dbTeamSeason = null;
+				if (!dbTeamSeasons.TryGetValue(feedTeam.Id, out dbTeamSeason))
+				{
+					dbTeamSeason = new Model.TeamSeason
+					{
+						Team = dbTeam,
+						Season = this.Season,
+						AssociationSeason = dbAssociationSeason,
+						LeagueSeason = dbLeagueSeason,
+						DivisionSeason = dbDivisionSeason,
+						VenueSeason = dbVenueSeason,
+						FileCode = feedTeam.FileCode,
+						FullName = feedTeam.Name,
+						SpringLeagueSeason = dbSpringLeagueSeason,
+						TeamAbbr = feedTeam.Abbreviation,
+						TeamCode = feedTeam.TeamCode,
+						TeamLocation = feedTeam.LocationName,
+						TeamName = feedTeam.TeamName
+					};
+					dbTeamSeasons.Add(dbTeam.TeamID, dbTeamSeason);
+					context.TeamSeasons.Add(dbTeamSeason);
+				}
 			}
+
+			var feedChildTeams = feed.Teams.Where(x => x.ParentOrgId.HasValue);
+			foreach (var feedChildTeam in feedChildTeams)
+			{
+				var dbChildTeamSeason = dbTeamSeasons[feedChildTeam.Id];
+				if (!dbTeamSeasons.TryGetValue(feedChildTeam.ParentOrgId.Value, out Model.TeamSeason dbParentTeamSeason))
+				{
+					dbParentTeamSeason = new Model.TeamSeason
+					{
+						TeamID = feedChildTeam.ParentOrgId.Value,
+						Season = this.Season,
+						TeamName = feedChildTeam.ParentOrgName
+					};
+					dbTeamSeasons.Add(feedChildTeam.ParentOrgId.Value, dbParentTeamSeason);
+					context.TeamSeasons.Add(dbParentTeamSeason);
+				}
+				dbChildTeamSeason.ParentOrgSeason = dbParentTeamSeason;
+			}
+
 			context.SaveChanges();
 		}
 	}

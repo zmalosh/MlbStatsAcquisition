@@ -31,6 +31,12 @@ namespace MlbStatsAcquisition.Model
 		public DbSet<Division> Divisions { get; set; }
 		public DbSet<Team> Teams { get; set; }
 
+		public DbSet<VenueSeason> VenueSeasons { get; set; }
+		public DbSet<AssociationSeason> AssociationSeasons { get; set; }
+		public DbSet<LeagueSeason> LeagueSeasons { get; set; }
+		public DbSet<DivisionSeason> DivisionSeasons { get; set; }
+		public DbSet<TeamSeason> TeamSeasons { get; set; }
+
 		protected override void OnModelCreating(DbModelBuilder modelBuilder)
 		{
 			base.OnModelCreating(modelBuilder);
@@ -64,9 +70,32 @@ namespace MlbStatsAcquisition.Model
 			modelBuilder.Entity<Team>().HasOptional(t => t.Association).WithMany(a => a.Teams).HasForeignKey(t => t.AssociationID).WillCascadeOnDelete(false);
 			modelBuilder.Entity<Team>().HasOptional(t => t.League).WithMany(lg => lg.Teams).HasForeignKey(t => t.LeagueID).WillCascadeOnDelete(false);
 			modelBuilder.Entity<Team>().HasOptional(t => t.Division).WithMany(lg => lg.Teams).HasForeignKey(t => t.DivisionID).WillCascadeOnDelete(false);
-			modelBuilder.Entity<Team>().HasOptional(t => t.Venue).WithMany(lg => lg.CurrentTeams).HasForeignKey(t => t.VenueID).WillCascadeOnDelete(false);
+			modelBuilder.Entity<Team>().HasOptional(t => t.Venue).WithMany(lg => lg.Teams).HasForeignKey(t => t.VenueID).WillCascadeOnDelete(false);
 			modelBuilder.Entity<Team>().HasOptional(t => t.SpringLeague).WithMany(t => t.SpringTeams).HasForeignKey(t => t.SpringLeagueID).WillCascadeOnDelete(false);
-			modelBuilder.Entity<Team>().HasOptional(t => t.ParentOrg).WithMany(t => t.ChildTeams).HasForeignKey(t => t.ParentOrgID).WillCascadeOnDelete(false);
+			modelBuilder.Entity<Team>().HasOptional(t => t.ParentOrg).WithMany(t => t.ChildOrgTeams).HasForeignKey(t => t.ParentOrgID).WillCascadeOnDelete(false);
+
+			modelBuilder.Entity<VenueSeason>().HasKey(vs => new { vs.VenueID, vs.Season });
+			modelBuilder.Entity<VenueSeason>().HasRequired(vs => vs.Venue).WithMany(v => v.VenueSeasons).HasForeignKey(vs => vs.VenueID).WillCascadeOnDelete(false);
+
+			modelBuilder.Entity<AssociationSeason>().HasKey(a => new { a.AssociationID, a.Season });
+			modelBuilder.Entity<AssociationSeason>().HasRequired(a => a.Association).WithMany(a => a.AssociationSeasons).HasForeignKey(a => a.AssociationID).WillCascadeOnDelete(false);
+
+			modelBuilder.Entity<LeagueSeason>().HasKey(ls => new { ls.LeagueID, ls.Season });
+			modelBuilder.Entity<LeagueSeason>().HasRequired(ls => ls.League).WithMany(lg => lg.LeagueSeasons).HasForeignKey(ls => ls.LeagueID).WillCascadeOnDelete(false);
+			modelBuilder.Entity<LeagueSeason>().HasRequired(ls => ls.AssociationSeason).WithMany(a => a.LeagueSeasons).HasForeignKey(ls => new { ls.AssociationID, ls.Season }).WillCascadeOnDelete(false);
+
+			modelBuilder.Entity<DivisionSeason>().HasKey(ds => new { ds.DivisionID, ds.Season });
+			modelBuilder.Entity<DivisionSeason>().HasRequired(ds => ds.Division).WithMany(d => d.DivisionSeasons).HasForeignKey(ds => ds.DivisionID).WillCascadeOnDelete(false);
+			modelBuilder.Entity<DivisionSeason>().HasRequired(ds => ds.LeagueSeason).WithMany(ls => ls.DivisionSeasons).HasForeignKey(ds => new { ds.LeagueID, ds.Season }).WillCascadeOnDelete(false);
+
+			modelBuilder.Entity<TeamSeason>().HasKey(ts => new { ts.TeamID, ts.Season });
+			modelBuilder.Entity<TeamSeason>().HasRequired(ts => ts.Team).WithMany(t => t.TeamSeasons).HasForeignKey(ts => ts.TeamID).WillCascadeOnDelete(false);
+			modelBuilder.Entity<TeamSeason>().HasOptional(ts => ts.AssociationSeason).WithMany(a => a.TeamSeasons).HasForeignKey(ts => new { ts.AssociationID, ts.Season }).WillCascadeOnDelete(false);
+			modelBuilder.Entity<TeamSeason>().HasOptional(ts => ts.LeagueSeason).WithMany(lg => lg.TeamSeasons).HasForeignKey(ts => new { ts.LeagueID, ts.Season }).WillCascadeOnDelete(false);
+			modelBuilder.Entity<TeamSeason>().HasOptional(ts => ts.DivisionSeason).WithMany(lg => lg.TeamSeasons).HasForeignKey(ts => new { ts.DivisionID, ts.Season }).WillCascadeOnDelete(false);
+			modelBuilder.Entity<TeamSeason>().HasOptional(ts => ts.SpringLeagueSeason).WithMany(t => t.SpringTeamSeasons).HasForeignKey(ts => new { ts.SpringLeagueID, ts.Season }).WillCascadeOnDelete(false);
+			modelBuilder.Entity<TeamSeason>().HasOptional(ts => ts.ParentOrgSeason).WithMany(t => t.ChildOrgSeasons).HasForeignKey(ts => new { ts.ParentOrgID, ts.Season }).WillCascadeOnDelete(false);
+			modelBuilder.Entity<TeamSeason>().HasOptional(ts => ts.VenueSeason).WithMany(v => v.TeamSeasons).HasForeignKey(ts => new { ts.VenueID, ts.Season }).WillCascadeOnDelete(false);
 		}
 
 		public override int SaveChanges()

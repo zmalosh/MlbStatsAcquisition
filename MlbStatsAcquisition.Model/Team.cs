@@ -31,6 +31,7 @@ namespace MlbStatsAcquisition.Model
 		public virtual Venue Venue { get; set; }
 		public virtual League SpringLeague { get; set; }
 		public virtual Team ParentOrg { get; set; }
-		public virtual ICollection<Team> ChildTeams { get; set; }
+		public virtual ICollection<Team> ChildOrgTeams { get; set; }
+		public virtual ICollection<TeamSeason> TeamSeasons { get; set; }
 	}
 }

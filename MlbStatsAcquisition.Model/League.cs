@@ -17,5 +17,6 @@ namespace MlbStatsAcquisition.Model
 		public virtual ICollection<Division> Divisions { get; set; }
 		public ICollection<Team> Teams { get; set; }
 		public ICollection<Team> SpringTeams { get; set; }
+		public ICollection<LeagueSeason> LeagueSeasons { get; set; }
 	}
 }

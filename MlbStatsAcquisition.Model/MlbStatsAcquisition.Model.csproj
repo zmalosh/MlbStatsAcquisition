@@ -49,13 +49,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Association.cs" />
+    <Compile Include="AssociationSeason.cs" />
     <Compile Include="Division.cs" />
+    <Compile Include="DivisionSeason.cs" />
     <Compile Include="League.cs" />
     <Compile Include="GameEventType.cs" />
     <Compile Include="GameStatusType.cs" />
     <Compile Include="GameType.cs" />
     <Compile Include="HitTrajectoryType.cs" />
     <Compile Include="JobType.cs" />
+    <Compile Include="LeagueSeason.cs" />
     <Compile Include="MlbStatsContext.cs" />
     <Compile Include="MlbStatsEntity.cs" />
     <Compile Include="PitchResultType.cs" />
@@ -68,7 +71,9 @@
     <Compile Include="StandingsType.cs" />
     <Compile Include="StatType.cs" />
     <Compile Include="Team.cs" />
+    <Compile Include="TeamSeason.cs" />
     <Compile Include="Venue.cs" />
+    <Compile Include="VenueSeason.cs" />
     <Compile Include="WindType.cs" />
   </ItemGroup>
   <ItemGroup>
