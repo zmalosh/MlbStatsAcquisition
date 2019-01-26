@@ -62,6 +62,7 @@
     <Compile Include="ReviewReasonType.cs" />
     <Compile Include="GameSituationType.cs" />
     <Compile Include="SkyType.cs" />
+    <Compile Include="StandingsType.cs" />
     <Compile Include="StatType.cs" />
     <Compile Include="Venue.cs" />
     <Compile Include="WindType.cs" />

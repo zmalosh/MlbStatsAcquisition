@@ -53,6 +53,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Feeds\StandingsTypesFeed.cs" />
     <Compile Include="Feeds\Converter.cs" />
     <Compile Include="Feeds\GameEventTypesFeed.cs" />
     <Compile Include="Feeds\GameStatusTypesFeed.cs" />
@@ -79,6 +80,7 @@
     <Compile Include="Processors\PositionsProcessor.cs" />
     <Compile Include="Processors\ReviewReasonTypesProcessor.cs" />
     <Compile Include="Processors\SkyTypesProcessor.cs" />
+    <Compile Include="Processors\StandingsTypesProcessor.cs" />
     <Compile Include="Processors\StatTypesProcessor.cs" />
     <Compile Include="Processors\VenuesProcessor.cs" />
     <Compile Include="Processors\WindTypesProcessor.cs" />

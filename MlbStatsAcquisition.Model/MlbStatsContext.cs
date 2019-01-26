@@ -22,6 +22,7 @@ namespace MlbStatsAcquisition.Model
 		public DbSet<PitchResultType> PitchResultTypes { get; set; }
 		public DbSet<ReviewReasonType> ReviewReasonTypes { get; set; }
 		public DbSet<SkyType> SkyTypes { get; set; }
+		public DbSet<StandingsType> StandingsTypes { get; set; }
 		public DbSet<WindType> WindTypes { get; set; }
 		public DbSet<Venue> Venues { get; set; }
 
@@ -39,6 +40,7 @@ namespace MlbStatsAcquisition.Model
 			modelBuilder.Entity<JobType>().HasKey(t => t.JobTypeID).Property(t => t.JobTypeID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
 			modelBuilder.Entity<SkyType>().HasKey(t => t.SkyTypeID).Property(t => t.SkyTypeID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
 			modelBuilder.Entity<WindType>().HasKey(t => t.WindTypeID).Property(t => t.WindTypeID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
+			modelBuilder.Entity<StandingsType>().HasKey(t => t.StandingsTypeID).Property(t => t.StandingsTypeID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
 			modelBuilder.Entity<ReviewReasonType>().HasKey(t => t.ReviewReasonTypeID).Property(t => t.ReviewReasonTypeID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
 			modelBuilder.Entity<Position>().HasKey(p => p.PositionAbbr).Property(p => p.PositionAbbr).HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
 
