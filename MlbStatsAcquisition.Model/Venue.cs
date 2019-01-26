@@ -9,8 +9,10 @@ namespace MlbStatsAcquisition.Model
 {
 	public class Venue : MlbStatsEntity
 	{
-		public int VenueId { get; set; }
+		public int VenueID { get; set; }
 		public string VenueName { get; set; }
 		public string VenueLink { get; set; }
+
+		public ICollection<Team> CurrentTeams { get; set; }
 	}
 }

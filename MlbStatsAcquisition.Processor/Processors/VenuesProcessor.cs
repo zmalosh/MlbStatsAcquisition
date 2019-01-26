@@ -19,18 +19,18 @@ namespace MlbStatsAcquisition.Processor.Processors
 				feed = Feeds.VenuesFeed.FromJson(rawJson);
 			}
 
-			var dbVenues = context.Venues.ToDictionary(x => x.VenueId);
+			var dbVenues = context.Venues.ToDictionary(x => x.VenueID);
 			foreach (var feedVenue in feed.Venues)
 			{
 				if (!dbVenues.TryGetValue(feedVenue.Id, out Model.Venue dbVenue))
 				{
 					dbVenue = new Model.Venue
 					{
-						VenueId = feedVenue.Id,
+						VenueID = feedVenue.Id,
 						VenueName = feedVenue.Name,
 						VenueLink = feedVenue.Link
 					};
-					dbVenues.Add(dbVenue.VenueId, dbVenue);
+					dbVenues.Add(dbVenue.VenueID, dbVenue);
 					context.Venues.Add(dbVenue);
 				}
 
