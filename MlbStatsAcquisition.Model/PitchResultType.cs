@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MlbStatsAcquisition.Model
 {
-	public class PitchResultType
+	public class PitchResultType : MlbStatsEntity
 	{
 		public int PitchResultTypeID { get; set; }
 		public string Code { get; set; }

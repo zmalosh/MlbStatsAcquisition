@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MlbStatsAcquisition.Model
 {
-	public class JobType
+	public class JobType : MlbStatsEntity
 	{
 		public int JobTypeID { get; set; }
 		public string Code { get; set; }

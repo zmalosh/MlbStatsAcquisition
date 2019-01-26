@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MlbStatsAcquisition.Model
 {
-	public class Position
+	public class Position : MlbStatsEntity
 	{
 		public string PositionAbbr { get; set; }
 		public string ShortName { get; set; }
