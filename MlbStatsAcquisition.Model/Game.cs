@@ -39,6 +39,7 @@ namespace MlbStatsAcquisition.Model
 		public byte? HomeWins { get; set; }
 		public byte? HomeLosses { get; set; }
 		public bool? IsHomeSplitSquad { get; set; }
+		public int? AltAssociationID { get; set; }
 		public string RawSeason { get; set; }
 		public DateTime? RescheduledDate { get; set; }
 		public DateTime? RescheduledFromDate { get; set; }

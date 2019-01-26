@@ -22,16 +22,18 @@ namespace MlbStatsAcquisition.Processor.Processors
 		{
 			var dbAssociations = context.Associations.ToDictionary(x => x.AssociationID);
 			var dbAssociationSeasons = context.AssociationSeasons.Where(x => x.Season == this.Season).ToDictionary(x => x.AssociationID);
-			var dbGames = context.Games.Where(x => x.Season == this.Season).ToDictionary(x => x.GameID);
 			var dbGameStatusIds = context.GameStatusTypes.ToDictionary(x => x.GameStatusCode, y => y.GameStatusTypeID);
 			var dbVenues = context.Venues.ToDictionary(x => x.VenueID);
 			var dbVenueSeasons = context.VenueSeasons.Where(x => x.Season == this.Season).ToDictionary(y => y.VenueID);
 			var dbTeams = context.Teams.ToDictionary(x => x.TeamID);
 			var dbTeamSeasons = context.TeamSeasons.Where(x => x.Season == this.Season).ToDictionary(y => y.TeamID);
+			var dbAllGameIds = context.Games.Select(x => x.GameID).ToList();
 
 			foreach (var associationId in this.AssociationIds)
 			{
 				Console.WriteLine($"GameScheduleProcessor - {this.Season} - {associationId}");
+
+				var dbGames = context.Games.Where(x => x.Season == this.Season && x.AssociationID == associationId).ToDictionary(x => x.GameID);
 
 				Feeds.GameScheduleFeed feed;
 				using (var client = new WebClient())
@@ -41,29 +43,30 @@ namespace MlbStatsAcquisition.Processor.Processors
 					feed = Feeds.GameScheduleFeed.FromJson(rawJson);
 				}
 
-				if (!dbAssociations.TryGetValue(associationId, out Model.Association dbAssociation))
-				{
-					dbAssociation = new Model.Association
-					{
-						AssociationID = associationId
-					};
-					dbAssociations.Add(associationId, dbAssociation);
-					context.Associations.Add(dbAssociation);
-				}
-
-				if (!dbAssociationSeasons.TryGetValue(dbAssociation.AssociationID, out Model.AssociationSeason dbAssociationSeason))
-				{
-					dbAssociationSeason = new Model.AssociationSeason
-					{
-						Association = dbAssociation,
-						Season = this.Season
-					};
-					dbAssociationSeasons.Add(dbAssociation.AssociationID, dbAssociationSeason);
-					context.AssociationSeasons.Add(dbAssociationSeason);
-				}
-
 				if (feed?.Dates != null && feed.Dates.Count > 0)
 				{
+					if (!dbAssociations.TryGetValue(associationId, out Model.Association dbAssociation))
+					{
+						dbAssociation = new Model.Association
+						{
+							AssociationID = associationId,
+							IsEnabled = false
+						};
+						dbAssociations.Add(associationId, dbAssociation);
+						context.Associations.Add(dbAssociation);
+					}
+
+					if (!dbAssociationSeasons.TryGetValue(dbAssociation.AssociationID, out Model.AssociationSeason dbAssociationSeason))
+					{
+						dbAssociationSeason = new Model.AssociationSeason
+						{
+							Association = dbAssociation,
+							Season = this.Season
+						};
+						dbAssociationSeasons.Add(dbAssociation.AssociationID, dbAssociationSeason);
+						context.AssociationSeasons.Add(dbAssociationSeason);
+					}
+
 					foreach (var feedDate in feed.Dates)
 					{
 						if (feedDate?.Games != null && feedDate.Games.Count > 0)
@@ -83,7 +86,8 @@ namespace MlbStatsAcquisition.Processor.Processors
 									context.Venues.Add(dbVenue);
 								}
 
-								if (dbVenue != null && !dbVenueSeasons.TryGetValue(dbVenue.VenueID, out Model.VenueSeason dbVenueSeason))
+								Model.VenueSeason dbVenueSeason = null;
+								if (dbVenue != null && !dbVenueSeasons.TryGetValue(dbVenue.VenueID, out dbVenueSeason))
 								{
 									dbVenueSeason = new Model.VenueSeason
 									{
@@ -163,55 +167,72 @@ namespace MlbStatsAcquisition.Processor.Processors
 
 								if (!dbGames.TryGetValue(feedGame.GamePk, out Model.Game dbGame))
 								{
-									dbGame = new Model.Game
+									if (dbAllGameIds.Contains(feedGame.GamePk))
 									{
-										GameID = feedGame.GamePk,
-										Season = this.Season,
-										Association = dbAssociation,
-										AssociationSeason = dbAssociationSeason,
-										GameTypeID = feedGame.GameType,
-										AwayTeam = dbAwayTeam,
-										HomeTeam = dbHomeTeam,
-										AwayTeamSeason = dbAwayTeamSeason,
-										HomeTeamSeason = dbHomeTeamSeason,
-										Venue = dbVenue,
-										GameTime = feedGame.GameDate,
-										GameStatus = dbGameStatusIds[feedGame.Status.StatusCode],
-										AwayScore = (byte?)feedGame.Teams?.Away?.Score,
-										HomeScore = (byte?)feedGame.Teams?.Home?.Score,
-										IsTie = feedGame.IsTie ?? false,
-										IsDoubleHeader = feedGame.IsDoubleHeader,
-										DayGameNum = (byte)feedGame.GameNumber,
-										IsDayGame = feedGame.IsDayGame,
-										IsTBD = feedGame.Status?.StartTimeTbd ?? false,
-										IsIfNecessary = feedGame.IfNecessary,
-										IfNecessaryDescription = feedGame.IfNecessaryDescription,
-										ScheduledLength = (byte)feedGame.ScheduledInnings,
-										SeriesLength = (byte?)feedGame.GamesInSeries,
-										SeriesGameNum = (byte?)feedGame.SeriesGameNumber,
-										SeriesDescription = feedGame.SeriesDescription,
-										RecordSource = feedGame.RecordSource,
-										AwaySeriesNum = (byte?)feedGame.Teams?.Away?.SeriesNumber,
-										AwayWins = (byte?)feedGame.Teams?.Away?.LeagueRecord?.Wins,
-										AwayLosses = (byte?)feedGame.Teams?.Away?.LeagueRecord?.Losses,
-										IsAwaySplitSquad = feedGame.Teams?.Away?.SplitSquad,
-										HomeSeriesNum = (byte?)feedGame.Teams?.Home?.SeriesNumber,
-										HomeWins = (byte?)feedGame.Teams?.Home?.LeagueRecord?.Wins,
-										HomeLosses = (byte?)feedGame.Teams?.Home?.LeagueRecord?.Losses,
-										IsHomeSplitSquad = feedGame.Teams?.Home?.SplitSquad,
-										RawSeason = feedGame.RawSeason,
-										RescheduledDate = feedGame.RescheduleDate,
-										RescheduledFromDate = feedGame.RescheduledFrom,
-										ResumeDate = feedGame.ResumeDate,
-										ResumedFrom = feedGame.ResumedFrom
-									};
-									dbGames.Add(dbGame.GameID, dbGame);
-									context.Games.Add(dbGame);
+										// GAME IS RETURNED FOR MULTIPLE ASSOCIATIONS
+										dbGame = context.Games.Single(x => x.GameID == feedGame.GamePk);
+										if (dbGame.AltAssociationID.HasValue && dbGame.AltAssociationID.Value != associationId)
+										{
+											throw new ArgumentException(string.Format($"GAME HAS MORE THAN 2 ASSOCIATIONS. WTF?! - {feedGame.GamePk}"));
+										}
+										dbGame.AltAssociationID = associationId;
+									}
+									else
+									{
+										dbGame = new Model.Game
+										{
+											GameID = feedGame.GamePk,
+											Season = this.Season,
+											Association = dbAssociation,
+											AssociationSeason = dbAssociationSeason,
+											GameTypeID = feedGame.GameType,
+											AwayTeam = dbAwayTeam,
+											HomeTeam = dbHomeTeam,
+											AwayTeamSeason = dbAwayTeamSeason,
+											HomeTeamSeason = dbHomeTeamSeason,
+											Venue = dbVenue,
+											VenueSeason = dbVenueSeason,
+											GameTime = feedGame.GameDate,
+											GameStatus = dbGameStatusIds[feedGame.Status.StatusCode],
+											AwayScore = (byte?)feedGame.Teams?.Away?.Score,
+											HomeScore = (byte?)feedGame.Teams?.Home?.Score,
+											IsTie = feedGame.IsTie ?? false,
+											IsDoubleHeader = feedGame.IsDoubleHeader,
+											DayGameNum = (byte)feedGame.GameNumber,
+											IsDayGame = feedGame.IsDayGame,
+											IsTBD = feedGame.Status?.StartTimeTbd ?? false,
+											IsIfNecessary = feedGame.IfNecessary,
+											IfNecessaryDescription = feedGame.IfNecessaryDescription,
+											ScheduledLength = (byte)feedGame.ScheduledInnings,
+											SeriesLength = (byte?)feedGame.GamesInSeries,
+											SeriesGameNum = (byte?)feedGame.SeriesGameNumber,
+											SeriesDescription = feedGame.SeriesDescription,
+											RecordSource = feedGame.RecordSource,
+											AwaySeriesNum = (byte?)feedGame.Teams?.Away?.SeriesNumber,
+											AwayWins = (byte?)feedGame.Teams?.Away?.LeagueRecord?.Wins,
+											AwayLosses = (byte?)feedGame.Teams?.Away?.LeagueRecord?.Losses,
+											IsAwaySplitSquad = feedGame.Teams?.Away?.SplitSquad,
+											HomeSeriesNum = (byte?)feedGame.Teams?.Home?.SeriesNumber,
+											HomeWins = (byte?)feedGame.Teams?.Home?.LeagueRecord?.Wins,
+											HomeLosses = (byte?)feedGame.Teams?.Home?.LeagueRecord?.Losses,
+											IsHomeSplitSquad = feedGame.Teams?.Home?.SplitSquad,
+											AltAssociationID = null,
+											RawSeason = feedGame.RawSeason,
+											RescheduledDate = feedGame.RescheduleDate,
+											RescheduledFromDate = feedGame.RescheduledFrom,
+											ResumeDate = feedGame.ResumeDate,
+											ResumedFrom = feedGame.ResumedFrom
+										};
+										dbGames.Add(dbGame.GameID, dbGame);
+										dbAllGameIds.Add(dbGame.GameID);
+										context.Games.Add(dbGame);
+									}
 								}
 								else
 								{
 									; // TODO: UPDATE GAME VALUES
 								}
+
 							}
 						}
 					}

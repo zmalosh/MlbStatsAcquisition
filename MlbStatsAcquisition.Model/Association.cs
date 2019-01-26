@@ -10,6 +10,9 @@ namespace MlbStatsAcquisition.Model
 	{
 		public int AssociationID { get; set; }
 		public string AssociationName { get; set; }
+		public string AssociationAbbr { get; set; }
+		public bool IsEnabled { get; set; }
+		public string AssociationCode { get; set; }
 		public string AssociationLink { get; set; }
 
 		public virtual ICollection<League> Leagues { get; set; }
