@@ -61,8 +61,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReviewReasonType.cs" />
     <Compile Include="GameSituationType.cs" />
+    <Compile Include="SkyType.cs" />
     <Compile Include="StatType.cs" />
     <Compile Include="Venue.cs" />
+    <Compile Include="WindType.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

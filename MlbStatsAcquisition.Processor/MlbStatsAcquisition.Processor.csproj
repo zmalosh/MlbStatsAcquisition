@@ -64,8 +64,10 @@
     <Compile Include="Feeds\PositionsFeed.cs" />
     <Compile Include="Feeds\ReviewReasonTypesFeed.cs" />
     <Compile Include="Feeds\GameSituationTypesFeed.cs" />
+    <Compile Include="Feeds\SkyTypesFeed.cs" />
     <Compile Include="Feeds\StatTypesFeed.cs" />
     <Compile Include="Feeds\VenuesFeed.cs" />
+    <Compile Include="Feeds\WindTypesFeed.cs" />
     <Compile Include="Processors\GameEventTypesProcessor.cs" />
     <Compile Include="Processors\GameSituationTypesProcessor.cs" />
     <Compile Include="Processors\GameStatusTypesProcessor.cs" />
@@ -76,8 +78,10 @@
     <Compile Include="Processors\PitchTypesProcessor.cs" />
     <Compile Include="Processors\PositionsProcessor.cs" />
     <Compile Include="Processors\ReviewReasonTypesProcessor.cs" />
+    <Compile Include="Processors\SkyTypesProcessor.cs" />
     <Compile Include="Processors\StatTypesProcessor.cs" />
     <Compile Include="Processors\VenuesProcessor.cs" />
+    <Compile Include="Processors\WindTypesProcessor.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
