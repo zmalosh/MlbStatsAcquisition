@@ -9,7 +9,7 @@ namespace MlbStatsAcquisition.Processor.Processors
 {
 	public class GameEventTypesProcessor : IProcessor
 	{
-		public void Run()
+		public void Run(Model.MlbStatsContext context)
 		{
 			List<Feeds.GameEventTypesFeed> feed;
 			using (var client = new WebClient())
@@ -18,30 +18,27 @@ namespace MlbStatsAcquisition.Processor.Processors
 				var rawJson = client.DownloadString(url);
 				feed = Feeds.GameEventTypesFeed.FromJson(rawJson);
 			}
-			using (var context = new Model.MlbStatsContext())
+
+			var dbGameEventTypes = context.GameEventTypes.ToDictionary(x => x.Code);
+			foreach (var feedGameEventType in feed)
 			{
-				var dbGameEventTypes = context.GameEventTypes.ToDictionary(x => x.Code);
-				foreach (var feedGameEventType in feed)
+				if (!dbGameEventTypes.TryGetValue(feedGameEventType.Code, out Model.GameEventType dbGameEventType))
 				{
-					if (!dbGameEventTypes.TryGetValue(feedGameEventType.Code, out Model.GameEventType dbGameEventType))
+					dbGameEventType = new Model.GameEventType
 					{
-						dbGameEventType = new Model.GameEventType
-						{
-							Code = feedGameEventType.Code,
-							Description = feedGameEventType.Description
-						};
-						dbGameEventTypes.Add(feedGameEventType.Code, dbGameEventType);
-						context.GameEventTypes.Add(dbGameEventType);
-					}
-					else
+						Code = feedGameEventType.Code,
+						Description = feedGameEventType.Description
+					};
+					dbGameEventTypes.Add(feedGameEventType.Code, dbGameEventType);
+					context.GameEventTypes.Add(dbGameEventType);
+				}
+				else
+				{
+					if (!string.Equals(dbGameEventType.Description, feedGameEventType.Description, StringComparison.InvariantCultureIgnoreCase))
 					{
-						if (!string.Equals(dbGameEventType.Description, feedGameEventType.Description, StringComparison.InvariantCultureIgnoreCase))
-						{
-							dbGameEventType.Description = feedGameEventType.Description;
-						}
+						dbGameEventType.Description = feedGameEventType.Description;
 					}
 				}
-				context.SaveChanges();
 			}
 		}
 	}

@@ -8,6 +8,6 @@ namespace MlbStatsAcquisition.Processor.Processors
 {
 	public interface IProcessor
 	{
-		void Run();
+		void Run(Model.MlbStatsContext context);
 	}
 }

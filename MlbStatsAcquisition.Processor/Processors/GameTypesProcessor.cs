@@ -9,7 +9,7 @@ namespace MlbStatsAcquisition.Processor.Processors
 {
 	public class GameTypesProcessor : IProcessor
 	{
-		public void Run()
+		public void Run(Model.MlbStatsContext context)
 		{
 			List<Feeds.GameTypesFeed> feed;
 			using (var client = new WebClient())
@@ -18,30 +18,27 @@ namespace MlbStatsAcquisition.Processor.Processors
 				var rawJson = client.DownloadString(url);
 				feed = Feeds.GameTypesFeed.FromJson(rawJson);
 			}
-			using (var context = new Model.MlbStatsContext())
+
+			var dbGameTypes = context.GameTypes.ToDictionary(x => x.GameTypeID);
+			foreach (var feedGameType in feed)
 			{
-				var dbGameTypes = context.GameTypes.ToDictionary(x => x.GameTypeID);
-				foreach (var feedGameType in feed)
+				if (!dbGameTypes.TryGetValue(feedGameType.Id, out Model.GameType dbGameType))
 				{
-					if (!dbGameTypes.TryGetValue(feedGameType.Id, out Model.GameType dbGameType))
+					dbGameType = new Model.GameType
 					{
-						dbGameType = new Model.GameType
-						{
-							GameTypeID = feedGameType.Id,
-							Description = feedGameType.Description
-						};
-						dbGameTypes.Add(dbGameType.GameTypeID, dbGameType);
-						context.GameTypes.Add(dbGameType);
-					}
-					else
+						GameTypeID = feedGameType.Id,
+						Description = feedGameType.Description
+					};
+					dbGameTypes.Add(dbGameType.GameTypeID, dbGameType);
+					context.GameTypes.Add(dbGameType);
+				}
+				else
+				{
+					if (!string.Equals(dbGameType.Description, feedGameType.Description, StringComparison.InvariantCultureIgnoreCase))
 					{
-						if (!string.Equals(dbGameType.Description, feedGameType.Description, StringComparison.InvariantCultureIgnoreCase))
-						{
-							dbGameType.Description = feedGameType.Description;
-						}
+						dbGameType.Description = feedGameType.Description;
 					}
 				}
-				context.SaveChanges();
 			}
 		}
 	}

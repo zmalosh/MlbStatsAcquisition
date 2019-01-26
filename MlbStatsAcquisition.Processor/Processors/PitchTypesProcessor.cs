@@ -9,7 +9,7 @@ namespace MlbStatsAcquisition.Processor.Processors
 {
 	public class PitchTypesProcessor : IProcessor
 	{
-		public void Run()
+		public void Run(Model.MlbStatsContext context)
 		{
 			List<Feeds.PitchTypesFeed> feed;
 			using (var client = new WebClient())
@@ -18,30 +18,27 @@ namespace MlbStatsAcquisition.Processor.Processors
 				var rawJson = client.DownloadString(url);
 				feed = Feeds.PitchTypesFeed.FromJson(rawJson);
 			}
-			using (var context = new Model.MlbStatsContext())
+
+			var dbPitchTypes = context.PitchTypes.ToDictionary(x => x.Code);
+			foreach (var feedPitchType in feed)
 			{
-				var dbPitchTypes = context.PitchTypes.ToDictionary(x => x.Code);
-				foreach (var feedPitchType in feed)
+				if (!dbPitchTypes.TryGetValue(feedPitchType.Code, out Model.PitchType dbPitchType))
 				{
-					if (!dbPitchTypes.TryGetValue(feedPitchType.Code, out Model.PitchType dbPitchType))
+					dbPitchType = new Model.PitchType
 					{
-						dbPitchType = new Model.PitchType
-						{
-							Code = feedPitchType.Code,
-							Description = feedPitchType.Description
-						};
-						dbPitchTypes.Add(feedPitchType.Code, dbPitchType);
-						context.PitchTypes.Add(dbPitchType);
-					}
-					else
+						Code = feedPitchType.Code,
+						Description = feedPitchType.Description
+					};
+					dbPitchTypes.Add(feedPitchType.Code, dbPitchType);
+					context.PitchTypes.Add(dbPitchType);
+				}
+				else
+				{
+					if (!string.Equals(dbPitchType.Description, feedPitchType.Description, StringComparison.InvariantCultureIgnoreCase))
 					{
-						if (!string.Equals(dbPitchType.Description, feedPitchType.Description, StringComparison.InvariantCultureIgnoreCase))
-						{
-							dbPitchType.Description = feedPitchType.Description;
-						}
+						dbPitchType.Description = feedPitchType.Description;
 					}
 				}
-				context.SaveChanges();
 			}
 		}
 	}

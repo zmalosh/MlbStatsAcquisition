@@ -9,7 +9,7 @@ namespace MlbStatsAcquisition.Processor.Processors
 {
 	public class ReviewReasonTypesProcessor : IProcessor
 	{
-		public void Run()
+		public void Run(Model.MlbStatsContext context)
 		{
 			List<Feeds.ReviewReasonTypesFeed> feed;
 			using (var client = new WebClient())
@@ -18,30 +18,27 @@ namespace MlbStatsAcquisition.Processor.Processors
 				var rawJson = client.DownloadString(url);
 				feed = Feeds.ReviewReasonTypesFeed.FromJson(rawJson);
 			}
-			using (var context = new Model.MlbStatsContext())
+
+			var dbReviewReasonTypes = context.ReviewReasonTypes.ToDictionary(x => x.Code);
+			foreach (var feedReviewReasonType in feed)
 			{
-				var dbReviewReasonTypes = context.ReviewReasonTypes.ToDictionary(x => x.Code);
-				foreach (var feedReviewReasonType in feed)
+				if (!dbReviewReasonTypes.TryGetValue(feedReviewReasonType.Code, out Model.ReviewReasonType dbReviewReasonType))
 				{
-					if (!dbReviewReasonTypes.TryGetValue(feedReviewReasonType.Code, out Model.ReviewReasonType dbReviewReasonType))
+					dbReviewReasonType = new Model.ReviewReasonType
 					{
-						dbReviewReasonType = new Model.ReviewReasonType
-						{
-							Code = feedReviewReasonType.Code,
-							Description = feedReviewReasonType.Description
-						};
-						dbReviewReasonTypes.Add(feedReviewReasonType.Code, dbReviewReasonType);
-						context.ReviewReasonTypes.Add(dbReviewReasonType);
-					}
-					else
+						Code = feedReviewReasonType.Code,
+						Description = feedReviewReasonType.Description
+					};
+					dbReviewReasonTypes.Add(feedReviewReasonType.Code, dbReviewReasonType);
+					context.ReviewReasonTypes.Add(dbReviewReasonType);
+				}
+				else
+				{
+					if (!string.Equals(dbReviewReasonType.Description, feedReviewReasonType.Description, StringComparison.InvariantCultureIgnoreCase))
 					{
-						if (!string.Equals(dbReviewReasonType.Description, feedReviewReasonType.Description, StringComparison.InvariantCultureIgnoreCase))
-						{
-							dbReviewReasonType.Description = feedReviewReasonType.Description;
-						}
+						dbReviewReasonType.Description = feedReviewReasonType.Description;
 					}
 				}
-				context.SaveChanges();
 			}
 		}
 	}

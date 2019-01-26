@@ -9,7 +9,7 @@ namespace MlbStatsAcquisition.Processor.Processors
 {
 	public class VenuesProcessor : IProcessor
 	{
-		public void Run()
+		public void Run(Model.MlbStatsContext context)
 		{
 			Feeds.VenuesFeed feed;
 			using (var client = new WebClient())
@@ -18,29 +18,26 @@ namespace MlbStatsAcquisition.Processor.Processors
 				var rawJson = client.DownloadString(url);
 				feed = Feeds.VenuesFeed.FromJson(rawJson);
 			}
-			using (var context = new Model.MlbStatsContext())
-			{
-				var dbVenues = context.Venues.ToDictionary(x => x.VenueId);
-				foreach (var feedVenue in feed.Venues)
-				{
-					if (!dbVenues.TryGetValue(feedVenue.Id, out Model.Venue dbVenue))
-					{
-						dbVenue = new Model.Venue
-						{
-							VenueId = feedVenue.Id,
-							VenueName = feedVenue.Name,
-							VenueLink = feedVenue.Link
-						};
-						dbVenues.Add(dbVenue.VenueId, dbVenue);
-						context.Venues.Add(dbVenue);
-					}
 
-					if (dbVenue.VenueName != feedVenue.Name)
+			var dbVenues = context.Venues.ToDictionary(x => x.VenueId);
+			foreach (var feedVenue in feed.Venues)
+			{
+				if (!dbVenues.TryGetValue(feedVenue.Id, out Model.Venue dbVenue))
+				{
+					dbVenue = new Model.Venue
 					{
-						dbVenue.VenueName = feedVenue.Name;
-					}
+						VenueId = feedVenue.Id,
+						VenueName = feedVenue.Name,
+						VenueLink = feedVenue.Link
+					};
+					dbVenues.Add(dbVenue.VenueId, dbVenue);
+					context.Venues.Add(dbVenue);
 				}
-				context.SaveChanges();
+
+				if (dbVenue.VenueName != feedVenue.Name)
+				{
+					dbVenue.VenueName = feedVenue.Name;
+				}
 			}
 		}
 	}

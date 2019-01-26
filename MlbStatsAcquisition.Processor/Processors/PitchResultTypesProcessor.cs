@@ -9,7 +9,7 @@ namespace MlbStatsAcquisition.Processor.Processors
 {
 	public class PitchResultTypesProcessor : IProcessor
 	{
-		public void Run()
+		public void Run(Model.MlbStatsContext context)
 		{
 			List<Feeds.PitchResultTypesFeed> feed;
 			using (var client = new WebClient())
@@ -18,30 +18,27 @@ namespace MlbStatsAcquisition.Processor.Processors
 				var rawJson = client.DownloadString(url);
 				feed = Feeds.PitchResultTypesFeed.FromJson(rawJson);
 			}
-			using (var context = new Model.MlbStatsContext())
+
+			var dbPitchResultTypes = context.PitchResultTypes.ToDictionary(x => x.Code);
+			foreach (var feedPitchResultType in feed)
 			{
-				var dbPitchResultTypes = context.PitchResultTypes.ToDictionary(x => x.Code);
-				foreach (var feedPitchResultType in feed)
+				if (!dbPitchResultTypes.TryGetValue(feedPitchResultType.Code, out Model.PitchResultType dbPitchResultType))
 				{
-					if (!dbPitchResultTypes.TryGetValue(feedPitchResultType.Code, out Model.PitchResultType dbPitchResultType))
+					dbPitchResultType = new Model.PitchResultType
 					{
-						dbPitchResultType = new Model.PitchResultType
-						{
-							Code = feedPitchResultType.Code,
-							Description = feedPitchResultType.Description
-						};
-						dbPitchResultTypes.Add(feedPitchResultType.Code, dbPitchResultType);
-						context.PitchResultTypes.Add(dbPitchResultType);
-					}
-					else
+						Code = feedPitchResultType.Code,
+						Description = feedPitchResultType.Description
+					};
+					dbPitchResultTypes.Add(feedPitchResultType.Code, dbPitchResultType);
+					context.PitchResultTypes.Add(dbPitchResultType);
+				}
+				else
+				{
+					if (!string.Equals(dbPitchResultType.Description, feedPitchResultType.Description, StringComparison.InvariantCultureIgnoreCase))
 					{
-						if (!string.Equals(dbPitchResultType.Description, feedPitchResultType.Description, StringComparison.InvariantCultureIgnoreCase))
-						{
-							dbPitchResultType.Description = feedPitchResultType.Description;
-						}
+						dbPitchResultType.Description = feedPitchResultType.Description;
 					}
 				}
-				context.SaveChanges();
 			}
 		}
 	}

@@ -9,7 +9,7 @@ namespace MlbStatsAcquisition.Processor.Processors
 {
 	public class HitTrajectoryTypesProcessor : IProcessor
 	{
-		public void Run()
+		public void Run(Model.MlbStatsContext context)
 		{
 			List<Feeds.HitTrajectoriesFeed> feed;
 			using (var client = new WebClient())
@@ -18,30 +18,27 @@ namespace MlbStatsAcquisition.Processor.Processors
 				var rawJson = client.DownloadString(url);
 				feed = Feeds.HitTrajectoriesFeed.FromJson(rawJson);
 			}
-			using (var context = new Model.MlbStatsContext())
+
+			var dbHitTrajectoryTypes = context.HitTrajectoryTypes.ToDictionary(x => x.Code);
+			foreach (var feedHitTrajectoryType in feed)
 			{
-				var dbHitTrajectoryTypes = context.HitTrajectoryTypes.ToDictionary(x => x.Code);
-				foreach (var feedHitTrajectoryType in feed)
+				if (!dbHitTrajectoryTypes.TryGetValue(feedHitTrajectoryType.Code, out Model.HitTrajectoryType dbHitTrajectoryType))
 				{
-					if (!dbHitTrajectoryTypes.TryGetValue(feedHitTrajectoryType.Code, out Model.HitTrajectoryType dbHitTrajectoryType))
+					dbHitTrajectoryType = new Model.HitTrajectoryType
 					{
-						dbHitTrajectoryType = new Model.HitTrajectoryType
-						{
-							Code = feedHitTrajectoryType.Code,
-							Description = feedHitTrajectoryType.Description
-						};
-						dbHitTrajectoryTypes.Add(feedHitTrajectoryType.Code, dbHitTrajectoryType);
-						context.HitTrajectoryTypes.Add(dbHitTrajectoryType);
-					}
-					else
+						Code = feedHitTrajectoryType.Code,
+						Description = feedHitTrajectoryType.Description
+					};
+					dbHitTrajectoryTypes.Add(feedHitTrajectoryType.Code, dbHitTrajectoryType);
+					context.HitTrajectoryTypes.Add(dbHitTrajectoryType);
+				}
+				else
+				{
+					if (!string.Equals(dbHitTrajectoryType.Description, feedHitTrajectoryType.Description, StringComparison.InvariantCultureIgnoreCase))
 					{
-						if (!string.Equals(dbHitTrajectoryType.Description, feedHitTrajectoryType.Description, StringComparison.InvariantCultureIgnoreCase))
-						{
-							dbHitTrajectoryType.Description = feedHitTrajectoryType.Description;
-						}
+						dbHitTrajectoryType.Description = feedHitTrajectoryType.Description;
 					}
 				}
-				context.SaveChanges();
 			}
 		}
 	}

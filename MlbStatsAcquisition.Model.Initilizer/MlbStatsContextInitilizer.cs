@@ -34,8 +34,9 @@ namespace MlbStatsAcquisition.Model.Initilizer
 
 			foreach (var processor in processors)
 			{
-				processor.Run();
+				processor.Run(context);
 			}
+			context.SaveChanges();
 		}
 	}
 }

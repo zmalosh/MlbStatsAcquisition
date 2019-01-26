@@ -9,7 +9,7 @@ namespace MlbStatsAcquisition.Processor.Processors
 {
 	public class StandingsTypesProcessor : IProcessor
 	{
-		public void Run()
+		public void Run(Model.MlbStatsContext context)
 		{
 			List<Feeds.StandingsTypesFeed> feed;
 			using (var client = new WebClient())
@@ -18,30 +18,27 @@ namespace MlbStatsAcquisition.Processor.Processors
 				var rawJson = client.DownloadString(url);
 				feed = Feeds.StandingsTypesFeed.FromJson(rawJson);
 			}
-			using (var context = new Model.MlbStatsContext())
+
+			var dbStandingsTypes = context.StandingsTypes.ToDictionary(x => x.StandingsTypeName);
+			foreach (var feedStandingsType in feed)
 			{
-				var dbStandingsTypes = context.StandingsTypes.ToDictionary(x => x.StandingsTypeName);
-				foreach (var feedStandingsType in feed)
+				if (!dbStandingsTypes.TryGetValue(feedStandingsType.Name, out Model.StandingsType dbStandingsType))
 				{
-					if (!dbStandingsTypes.TryGetValue(feedStandingsType.Name, out Model.StandingsType dbStandingsType))
+					dbStandingsType = new Model.StandingsType
 					{
-						dbStandingsType = new Model.StandingsType
-						{
-							StandingsTypeName = feedStandingsType.Name,
-							Description = feedStandingsType.Description
-						};
-						dbStandingsTypes.Add(feedStandingsType.Name, dbStandingsType);
-						context.StandingsTypes.Add(dbStandingsType);
-					}
-					else
+						StandingsTypeName = feedStandingsType.Name,
+						Description = feedStandingsType.Description
+					};
+					dbStandingsTypes.Add(feedStandingsType.Name, dbStandingsType);
+					context.StandingsTypes.Add(dbStandingsType);
+				}
+				else
+				{
+					if (!string.Equals(dbStandingsType.Description, feedStandingsType.Description, StringComparison.InvariantCultureIgnoreCase))
 					{
-						if (!string.Equals(dbStandingsType.Description, feedStandingsType.Description, StringComparison.InvariantCultureIgnoreCase))
-						{
-							dbStandingsType.Description = feedStandingsType.Description;
-						}
+						dbStandingsType.Description = feedStandingsType.Description;
 					}
 				}
-				context.SaveChanges();
 			}
 		}
 	}

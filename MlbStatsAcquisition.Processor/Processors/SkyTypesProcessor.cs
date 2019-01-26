@@ -9,7 +9,7 @@ namespace MlbStatsAcquisition.Processor.Processors
 {
 	public class SkyTypesProcessor : IProcessor
 	{
-		public void Run()
+		public void Run(Model.MlbStatsContext context)
 		{
 			List<Feeds.SkyTypesFeed> feed;
 			using (var client = new WebClient())
@@ -18,30 +18,27 @@ namespace MlbStatsAcquisition.Processor.Processors
 				var rawJson = client.DownloadString(url);
 				feed = Feeds.SkyTypesFeed.FromJson(rawJson);
 			}
-			using (var context = new Model.MlbStatsContext())
+
+			var dbSkyTypes = context.SkyTypes.ToDictionary(x => x.Code);
+			foreach (var feedSkyType in feed)
 			{
-				var dbSkyTypes = context.SkyTypes.ToDictionary(x => x.Code);
-				foreach (var feedSkyType in feed)
+				if (!dbSkyTypes.TryGetValue(feedSkyType.Code, out Model.SkyType dbSkyType))
 				{
-					if (!dbSkyTypes.TryGetValue(feedSkyType.Code, out Model.SkyType dbSkyType))
+					dbSkyType = new Model.SkyType
 					{
-						dbSkyType = new Model.SkyType
-						{
-							Code = feedSkyType.Code,
-							Description = feedSkyType.Description
-						};
-						dbSkyTypes.Add(feedSkyType.Code, dbSkyType);
-						context.SkyTypes.Add(dbSkyType);
-					}
-					else
+						Code = feedSkyType.Code,
+						Description = feedSkyType.Description
+					};
+					dbSkyTypes.Add(feedSkyType.Code, dbSkyType);
+					context.SkyTypes.Add(dbSkyType);
+				}
+				else
+				{
+					if (!string.Equals(dbSkyType.Description, feedSkyType.Description, StringComparison.InvariantCultureIgnoreCase))
 					{
-						if (!string.Equals(dbSkyType.Description, feedSkyType.Description, StringComparison.InvariantCultureIgnoreCase))
-						{
-							dbSkyType.Description = feedSkyType.Description;
-						}
+						dbSkyType.Description = feedSkyType.Description;
 					}
 				}
-				context.SaveChanges();
 			}
 		}
 	}
