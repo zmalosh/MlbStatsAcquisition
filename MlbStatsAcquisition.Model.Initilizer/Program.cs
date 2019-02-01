@@ -46,7 +46,7 @@ namespace MlbStatsAcquisition.Model.Initilizer
 				}
 
 				processors = new List<Processor.Processors.IProcessor>();
-				for (int i = 2019; i >= 1901; i--)
+				for (int i = 2019; i >= 2012; i--)
 				{
 					processors.Add(new Processor.Processors.TeamsProcessor(i));
 				}
