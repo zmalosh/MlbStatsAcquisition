@@ -182,7 +182,7 @@ namespace MlbStatsAcquisition.Processor.Processors
 										dbGame = new Model.Game
 										{
 											GameID = feedGame.GamePk,
-											Season = this.Season,
+											Season = feedGame.Season,
 											Association = dbAssociation,
 											AssociationSeason = dbAssociationSeason,
 											GameTypeID = feedGame.GameType,
