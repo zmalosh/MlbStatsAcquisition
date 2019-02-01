@@ -55,6 +55,7 @@
   <ItemGroup>
     <Compile Include="Feeds\AssociationsFeed.cs" />
     <Compile Include="Feeds\GameScheduleFeed.cs" />
+    <Compile Include="Feeds\PlayByPlayFeed.cs" />
     <Compile Include="Feeds\StandingsTypesFeed.cs" />
     <Compile Include="Feeds\Converter.cs" />
     <Compile Include="Feeds\GameEventTypesFeed.cs" />
