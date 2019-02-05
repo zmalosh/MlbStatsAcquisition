@@ -165,7 +165,7 @@ namespace MlbStatsAcquisition.Processor.Feeds
 		public class PlayEvent
 		{
 			[JsonProperty("details")]
-			public PurpleDetails Details { get; set; }
+			public EventDetails Details { get; set; }
 
 			[JsonProperty("count")]
 			public Count Count { get; set; }
@@ -210,7 +210,7 @@ namespace MlbStatsAcquisition.Processor.Feeds
 			public Position Position { get; set; }
 		}
 
-		public class PurpleDetails
+		public class EventDetails
 		{
 			[JsonProperty("call", NullValueHandling = NullValueHandling.Ignore)]
 			public CodedDataNode Call { get; set; }
