@@ -249,10 +249,10 @@ namespace MlbStatsAcquisition.Processor.Feeds
 			public string Event { get; set; }
 
 			[JsonProperty("awayScore", NullValueHandling = NullValueHandling.Ignore)]
-			public long? AwayScore { get; set; }
+			public int? AwayScore { get; set; }
 
 			[JsonProperty("homeScore", NullValueHandling = NullValueHandling.Ignore)]
-			public long? HomeScore { get; set; }
+			public int? HomeScore { get; set; }
 
 			[JsonProperty("isScoringPlay", NullValueHandling = NullValueHandling.Ignore)]
 			public bool? IsScoringPlay { get; set; }
@@ -282,7 +282,7 @@ namespace MlbStatsAcquisition.Processor.Feeds
 			public string Hardness { get; set; }
 
 			[JsonProperty("location", NullValueHandling = NullValueHandling.Ignore)]
-			public long? Location { get; set; }
+			public int? Location { get; set; }
 
 			[JsonProperty("coordinates")]
 			public HitDataCoordinates Coordinates { get; set; }
