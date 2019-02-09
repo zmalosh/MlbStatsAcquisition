@@ -38,7 +38,7 @@ namespace MlbStatsAcquisition.Model
 		public DbSet<TeamSeason> TeamSeasons { get; set; }
 
 		public DbSet<Game> Games { get; set; }
-		public DbSet<GamePlay> GamePlays { get; set; }
+		//public DbSet<GamePlay> GamePlays { get; set; }
 
 		protected override void OnModelCreating(DbModelBuilder modelBuilder)
 		{
@@ -110,8 +110,8 @@ namespace MlbStatsAcquisition.Model
 			modelBuilder.Entity<Game>().HasOptional(g => g.AwayTeamSeason).WithMany(t => t.AwayGames).HasForeignKey(g => new { g.AwayTeamID, g.Season }).WillCascadeOnDelete(false);
 			modelBuilder.Entity<Game>().HasOptional(g => g.VenueSeason).WithMany(v => v.Games).HasForeignKey(g => new { g.VenueID, g.Season }).WillCascadeOnDelete(false);
 
-			modelBuilder.Entity<GamePlay>().HasKey(g => g.GamePlayID).Property(g => g.GamePlayID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
-			modelBuilder.Entity<GamePlay>().HasRequired(g => g.Game).WithMany(g => g.Plays).HasForeignKey(g => g.GameID).WillCascadeOnDelete(false);
+			//modelBuilder.Entity<GamePlay>().HasKey(g => g.GamePlayID).Property(g => g.GamePlayID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
+			//modelBuilder.Entity<GamePlay>().HasRequired(g => g.Game).WithMany(g => g.Plays).HasForeignKey(g => g.GameID).WillCascadeOnDelete(false);
 		}
 
 		public override int SaveChanges()
