@@ -31,7 +31,7 @@ namespace MlbStatsAcquisition.Processor.Feeds
 		public string Link { get; set; }
 
 		[JsonProperty("teamId")]
-		public long TeamId { get; set; }
+		public int TeamId { get; set; }
 
 		[JsonProperty("rosterType")]
 		public string RosterType { get; set; }
@@ -51,7 +51,7 @@ namespace MlbStatsAcquisition.Processor.Feeds
 		public class Person
 		{
 			[JsonProperty("id")]
-			public long Id { get; set; }
+			public int Id { get; set; }
 
 			[JsonProperty("fullName")]
 			public string FullName { get; set; }
