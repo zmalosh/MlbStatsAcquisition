@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MlbStatsAcquisition.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -9,36 +10,44 @@ namespace MlbStatsAcquisition.Processor.Processors
 {
 	public class GameScheduleProcessor : IProcessor
 	{
-		private int Season { get; set; }
+		private int Year { get; set; }
 		private List<int> AssociationIds { get; set; }
 
-		public GameScheduleProcessor(int season, List<int> associationIds)
+		public GameScheduleProcessor(int year, List<int> associationIds)
 		{
-			this.Season = season;
+			this.Year = year;
 			this.AssociationIds = associationIds;
 		}
 
 		public void Run(Model.MlbStatsContext context)
 		{
 			var dbAssociations = context.Associations.ToDictionary(x => x.AssociationID);
-			var dbAssociationSeasons = context.AssociationSeasons.Where(x => x.Season == this.Season).ToDictionary(x => x.AssociationID);
+			var dbSeasonsByAssociation = context.AssociationSeasons.ToLookup(x => x.AssociationID, y => y.Season).ToDictionary(x => x.Key, y => y.ToList());
 			var dbGameStatusIds = context.GameStatusTypes.ToDictionary(x => x.GameStatusCode, y => y.GameStatusTypeID);
 			var dbVenues = context.Venues.ToDictionary(x => x.VenueID);
-			var dbVenueSeasons = context.VenueSeasons.Where(x => x.Season == this.Season).ToDictionary(y => y.VenueID);
+			var dbSeasonsByVenue = context.VenueSeasons.ToLookup(x => x.VenueID, y => y.Season).ToDictionary(x => x.Key, y => y.ToList());
 			var dbTeams = context.Teams.ToDictionary(x => x.TeamID);
-			var dbTeamSeasons = context.TeamSeasons.Where(x => x.Season == this.Season).ToDictionary(y => y.TeamID);
+			var dbSeasonsByTeam = context.TeamSeasons.ToLookup(x => x.TeamID, y => y.Season).ToDictionary(x => x.Key, y => y.ToList());
 			var dbAllGameIds = context.Games.Select(x => x.GameID).ToList();
+
+			var newTeams = new List<Team>();
+			var newTeamSeasons = new List<TeamSeason>();
+			var newVenues = new List<Venue>();
+			var newVenueSeasons = new List<VenueSeason>();
+			var newGames = new List<Game>();
+			var newAssociations = new List<Association>();
+			var newAssociationSeasons = new List<AssociationSeason>();
 
 			foreach (var associationId in this.AssociationIds)
 			{
-				Console.WriteLine($"GameScheduleProcessor - {this.Season} - {associationId}");
+				Console.WriteLine($"GameScheduleProcessor - {this.Year} - {associationId}");
 
-				var dbGames = context.Games.Where(x => x.Season == this.Season && x.AssociationID == associationId).ToDictionary(x => x.GameID);
+				var dbGames = context.Games.Where(x => x.GameTime.Year == this.Year && x.AssociationID == associationId).ToDictionary(x => x.GameID);
 
 				Feeds.GameScheduleFeed feed;
 				using (var client = new WebClient())
 				{
-					var url = Feeds.GameScheduleFeed.GetFeedUrl(this.Season, associationId);
+					var url = Feeds.GameScheduleFeed.GetFeedUrl(this.Year, associationId);
 					var rawJson = client.DownloadString(url);
 					feed = Feeds.GameScheduleFeed.FromJson(rawJson);
 				}
@@ -53,18 +62,27 @@ namespace MlbStatsAcquisition.Processor.Processors
 							IsEnabled = false
 						};
 						dbAssociations.Add(associationId, dbAssociation);
-						context.Associations.Add(dbAssociation);
+						newAssociations.Add(dbAssociation);
+						dbSeasonsByAssociation[associationId] = new List<int>();
 					}
 
-					if (!dbAssociationSeasons.TryGetValue(dbAssociation.AssociationID, out Model.AssociationSeason dbAssociationSeason))
+					var feedSeasonOptions = feed.Dates.SelectMany(x => x.Games.Select(y => y.Season));
+					foreach (var feedSeasonOption in feedSeasonOptions)
 					{
-						dbAssociationSeason = new Model.AssociationSeason
+						if (!dbSeasonsByAssociation.ContainsKey(associationId))
 						{
-							Association = dbAssociation,
-							Season = this.Season
-						};
-						dbAssociationSeasons.Add(dbAssociation.AssociationID, dbAssociationSeason);
-						context.AssociationSeasons.Add(dbAssociationSeason);
+							dbSeasonsByAssociation[associationId] = new List<int>();
+						}
+						if (!dbSeasonsByAssociation[associationId].Contains(feedSeasonOption))
+						{
+							var dbAssociationSeason = new Model.AssociationSeason
+							{
+								AssociationID = associationId,
+								Season = feedSeasonOption
+							};
+							newAssociationSeasons.Add(dbAssociationSeason);
+							dbSeasonsByAssociation[associationId].Add(feedSeasonOption);
+						}
 					}
 
 					foreach (var feedDate in feed.Dates)
@@ -82,21 +100,26 @@ namespace MlbStatsAcquisition.Processor.Processors
 										VenueName = feedGame.Venue.Name,
 										VenueLink = feedGame.Venue.Link
 									};
+									newVenues.Add(dbVenue);
 									dbVenues.Add(dbVenue.VenueID, dbVenue);
-									context.Venues.Add(dbVenue);
 								}
 
 								Model.VenueSeason dbVenueSeason = null;
-								if (dbVenue != null && !dbVenueSeasons.TryGetValue(dbVenue.VenueID, out dbVenueSeason))
+								if (!dbSeasonsByVenue.ContainsKey(feedGame.Venue.Id))
+								{
+									// THIS MAY BE THE FIRST VenueSeason.
+									dbSeasonsByVenue[feedGame.Venue.Id] = new List<int>();
+								}
+								if (!dbSeasonsByVenue[feedGame.Venue.Id].Contains(feedGame.Season))
 								{
 									dbVenueSeason = new Model.VenueSeason
 									{
-										Venue = dbVenue,
-										Season = this.Season,
-										VenueName = feedGame.Venue?.Name
+										VenueID = feedGame.Venue.Id,
+										Season = feedGame.Season,
+										VenueName = feedGame.Venue.Name
 									};
-									dbVenueSeasons.Add(dbVenue.VenueID, dbVenueSeason);
-									context.VenueSeasons.Add(dbVenueSeason);
+									newVenueSeasons.Add(dbVenueSeason);
+									dbSeasonsByVenue[feedGame.Venue.Id].Add(feedGame.Season);
 								}
 
 								var feedAwayTeam = feedGame.Teams?.Away?.Team;
@@ -107,29 +130,37 @@ namespace MlbStatsAcquisition.Processor.Processors
 									dbAwayTeam = new Model.Team
 									{
 										TeamID = feedAwayTeam.Id,
-										Association = dbAssociation,
+										AssociationID = associationId,
 										IsActive = false,
 										IsAllStar = false,
 										FirstSeason = null,
 										TeamFullName = feedAwayTeam.Name,
 										TeamName = feedAwayTeam.Name
 									};
+									newTeams.Add(dbAwayTeam);
 									dbTeams.Add(dbAwayTeam.TeamID, dbAwayTeam);
-									context.Teams.Add(dbAwayTeam);
 								}
 
 								Model.TeamSeason dbAwayTeamSeason = null;
-								if (dbAwayTeam != null && !dbTeamSeasons.TryGetValue(dbAwayTeam.TeamID, out dbAwayTeamSeason))
+								if (dbAwayTeam != null)
 								{
-									dbAwayTeamSeason = new Model.TeamSeason
+									if (!dbSeasonsByTeam.ContainsKey(feedAwayTeam.Id))
 									{
-										Team = dbAwayTeam,
-										Season = this.Season,
-										FullName = feedAwayTeam.Name,
-										TeamName = feedAwayTeam.Name,
-										AssociationSeason = dbAssociationSeason
-									};
-									dbTeamSeasons.Add(dbAwayTeam.TeamID, dbAwayTeamSeason);
+										dbSeasonsByTeam[feedAwayTeam.Id] = new List<int>();
+									}
+									if (!dbSeasonsByTeam[feedAwayTeam.Id].Contains(feedGame.Season))
+									{
+										dbAwayTeamSeason = new Model.TeamSeason
+										{
+											TeamID = feedAwayTeam.Id,
+											Season = feedGame.Season,
+											FullName = feedAwayTeam.Name,
+											TeamName = feedAwayTeam.Name,
+											AssociationID = associationId
+										};
+										newTeamSeasons.Add(dbAwayTeamSeason);
+										dbSeasonsByTeam[feedAwayTeam.Id].Add(feedGame.Season);
+									}
 								}
 
 								var feedHomeTeam = feedGame.Teams?.Home?.Team;
@@ -140,29 +171,37 @@ namespace MlbStatsAcquisition.Processor.Processors
 									dbHomeTeam = new Model.Team
 									{
 										TeamID = feedHomeTeam.Id,
-										Association = dbAssociation,
+										AssociationID = associationId,
 										IsActive = false,
 										IsAllStar = false,
 										FirstSeason = null,
 										TeamFullName = feedHomeTeam.Name,
 										TeamName = feedHomeTeam.Name
 									};
+									newTeams.Add(dbHomeTeam);
 									dbTeams.Add(dbHomeTeam.TeamID, dbHomeTeam);
-									context.Teams.Add(dbHomeTeam);
 								}
 
 								Model.TeamSeason dbHomeTeamSeason = null;
-								if (dbHomeTeam != null && !dbTeamSeasons.TryGetValue(dbHomeTeam.TeamID, out dbHomeTeamSeason))
+								if (dbHomeTeam != null)
 								{
-									dbHomeTeamSeason = new Model.TeamSeason
+									if (!dbSeasonsByTeam.ContainsKey(feedHomeTeam.Id))
 									{
-										Team = dbHomeTeam,
-										Season = this.Season,
-										FullName = feedHomeTeam.Name,
-										TeamName = feedHomeTeam.Name,
-										AssociationSeason = dbAssociationSeason
-									};
-									dbTeamSeasons.Add(dbHomeTeam.TeamID, dbHomeTeamSeason);
+										dbSeasonsByTeam[feedHomeTeam.Id] = new List<int>();
+									}
+									if (!dbSeasonsByTeam[feedHomeTeam.Id].Contains(feedGame.Season))
+									{
+										dbHomeTeamSeason = new Model.TeamSeason
+										{
+											TeamID = feedHomeTeam.Id,
+											Season = feedGame.Season,
+											FullName = feedHomeTeam.Name,
+											TeamName = feedHomeTeam.Name,
+											AssociationID = associationId
+										};
+										newTeamSeasons.Add(dbHomeTeamSeason);
+										dbSeasonsByTeam[feedHomeTeam.Id].Add(feedGame.Season);
+									}
 								}
 
 								if (!dbGames.TryGetValue(feedGame.GamePk, out Model.Game dbGame))
@@ -170,7 +209,15 @@ namespace MlbStatsAcquisition.Processor.Processors
 									if (dbAllGameIds.Contains(feedGame.GamePk))
 									{
 										// GAME IS RETURNED FOR MULTIPLE ASSOCIATIONS
-										dbGame = context.Games.Single(x => x.GameID == feedGame.GamePk);
+										dbGame = context.Games.SingleOrDefault(x => x.GameID == feedGame.GamePk);
+										if (dbGame == null)
+										{
+											dbGame = newGames.SingleOrDefault(x => x.GameID == feedGame.GamePk);
+										}
+										if (dbGame == null)
+										{
+											throw new NullReferenceException("GameID BUT NO GAME.... WTF?!");
+										}
 										if (dbGame.AltAssociationID.HasValue && dbGame.AltAssociationID.Value != associationId)
 										{
 											throw new ArgumentException(string.Format($"GAME HAS MORE THAN 2 ASSOCIATIONS. WTF?! - {feedGame.GamePk}"));
@@ -183,15 +230,11 @@ namespace MlbStatsAcquisition.Processor.Processors
 										{
 											GameID = feedGame.GamePk,
 											Season = feedGame.Season,
-											Association = dbAssociation,
-											AssociationSeason = dbAssociationSeason,
+											AssociationID = associationId,
 											GameTypeID = feedGame.GameType,
-											AwayTeam = dbAwayTeam,
-											HomeTeam = dbHomeTeam,
-											AwayTeamSeason = dbAwayTeamSeason,
-											HomeTeamSeason = dbHomeTeamSeason,
-											Venue = dbVenue,
-											VenueSeason = dbVenueSeason,
+											AwayTeamID = feedGame.Teams?.Away?.Team?.Id,
+											HomeTeamID = feedGame.Teams?.Home?.Team?.Id,
+											VenueID = feedGame.Venue.Id,
 											GameTime = feedGame.GameDate,
 											GameStatus = dbGameStatusIds[feedGame.Status.StatusCode],
 											AwayScore = (byte?)feedGame.Teams?.Away?.Score,
@@ -223,9 +266,9 @@ namespace MlbStatsAcquisition.Processor.Processors
 											ResumeDate = feedGame.ResumeDate,
 											ResumedFrom = feedGame.ResumedFrom
 										};
+										newGames.Add(dbGame);
 										dbGames.Add(dbGame.GameID, dbGame);
 										dbAllGameIds.Add(dbGame.GameID);
-										context.Games.Add(dbGame);
 									}
 								}
 								else
@@ -239,6 +282,17 @@ namespace MlbStatsAcquisition.Processor.Processors
 					context.SaveChanges();
 				}
 			}
+			context.Associations.AddRange(newAssociations);
+			context.Teams.AddRange(newTeams);
+			context.Venues.AddRange(newVenues);
+			context.SaveChanges();
+			context.AssociationSeasons.AddRange(newAssociationSeasons);
+			context.VenueSeasons.AddRange(newVenueSeasons);
+			context.SaveChanges();
+			context.TeamSeasons.AddRange(newTeamSeasons);
+			context.SaveChanges();
+			context.Games.AddRange(newGames);
+			context.SaveChanges();
 		}
 	}
 }
