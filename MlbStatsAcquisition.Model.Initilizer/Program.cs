@@ -57,12 +57,22 @@ namespace MlbStatsAcquisition.Model.Initilizer
 			}
 
 			var associationIds = context.Associations.Where(x => x.IsEnabled).Select(x => x.AssociationID).ToList();
-			for (int i = 2019; i >= 1901; i--)
+			for (int i = 2019; i >= 2015; i--)
 			{
 				processor = new Processor.Processors.GameScheduleProcessor(i, associationIds);
 				processor.Run(context);
 				context = GetNewContext();
 			}
+
+			processors = context.Games.Where(x => x.AssociationID != 1)
+										.ToList()
+										.Select(x => (Processor.Processors.IProcessor)new Processor.Processors.BoxscoreProcessor(x.GameID))
+										.ToList();
+			processors.ForEach(x =>
+			{
+				x.Run(context);
+				//context = GetNewContext();
+			});
 
 			context.Dispose();
 		}

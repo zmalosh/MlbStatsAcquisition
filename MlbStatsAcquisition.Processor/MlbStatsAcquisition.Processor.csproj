@@ -54,6 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Feeds\AssociationsFeed.cs" />
+    <Compile Include="Feeds\BoxscoreFeed.cs" />
     <Compile Include="Feeds\GameScheduleFeed.cs" />
     <Compile Include="Feeds\PlayByPlayFeed.cs" />
     <Compile Include="Feeds\RosterFeed.cs" />
@@ -75,6 +76,7 @@
     <Compile Include="Feeds\VenuesFeed.cs" />
     <Compile Include="Feeds\WindTypesFeed.cs" />
     <Compile Include="Processors\AssociationsProcessor.cs" />
+    <Compile Include="Processors\BoxscoreProcessor.cs" />
     <Compile Include="Processors\GameScheduleProcessor.cs" />
     <Compile Include="Processors\GameEventTypesProcessor.cs" />
     <Compile Include="Processors\GameSituationTypesProcessor.cs" />
