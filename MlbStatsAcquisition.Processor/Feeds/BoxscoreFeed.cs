@@ -157,91 +157,124 @@ namespace MlbStatsAcquisition.Processor.Feeds
 			public int? GamesPlayed { get; set; }
 
 			[JsonProperty("flyOuts")]
-			public int FlyOuts { get; set; }
+			public int? FlyOuts { get; set; }
 
 			[JsonProperty("groundOuts")]
-			public int GroundOuts { get; set; }
+			public int? GroundOuts { get; set; }
 
 			[JsonProperty("runs")]
-			public int Runs { get; set; }
+			public int? Runs { get; set; }
 
 			[JsonProperty("doubles")]
-			public int Doubles { get; set; }
+			public int? Doubles { get; set; }
 
 			[JsonProperty("triples")]
-			public int Triples { get; set; }
+			public int? Triples { get; set; }
 
 			[JsonProperty("homeRuns")]
-			public int HomeRuns { get; set; }
+			public int? HomeRuns { get; set; }
 
 			[JsonProperty("strikeOuts")]
-			public int StrikeOuts { get; set; }
+			public int? StrikeOuts { get; set; }
 
 			[JsonProperty("baseOnBalls")]
-			public int BaseOnBalls { get; set; }
+			public int? BaseOnBalls { get; set; }
 
 			[JsonProperty("intentionalWalks")]
-			public int IntentionalWalks { get; set; }
+			public int? IntentionalWalks { get; set; }
 
 			[JsonProperty("hits")]
-			public int Hits { get; set; }
+			public int? Hits { get; set; }
 
 			[JsonProperty("hitByPitch")]
-			public int HitByPitch { get; set; }
+			public int? HitByPitch { get; set; }
 
 			[JsonProperty("avg", NullValueHandling = NullValueHandling.Ignore)]
-			public string Avg { get; set; }
+			public string Avg { get; set; } // SEASON ONLY
 
 			[JsonProperty("atBats")]
-			public int AtBats { get; set; }
+			public int? AtBats { get; set; }
 
 			[JsonProperty("obp", NullValueHandling = NullValueHandling.Ignore)]
-			public string Obp { get; set; }
+			public string Obp { get; set; } // SEASON ONLY
 
 			[JsonProperty("slg", NullValueHandling = NullValueHandling.Ignore)]
-			public string Slg { get; set; }
+			public string Slg { get; set; } // SEASON ONLY
 
 			[JsonProperty("ops", NullValueHandling = NullValueHandling.Ignore)]
-			public string Ops { get; set; }
+			public string Ops { get; set; } // SEASON ONLY
 
 			[JsonProperty("caughtStealing")]
-			public int CaughtStealing { get; set; }
+			public int? CaughtStealing { get; set; }
 
 			[JsonProperty("stolenBases")]
-			public int StolenBases { get; set; }
+			public int? StolenBases { get; set; }
 
 			[JsonProperty("stolenBasePercentage", NullValueHandling = NullValueHandling.Ignore)]
-			public string StolenBasePercentage { get; set; }
+			public string StolenBasePercentage { get; set; } // SEASON ONLY
 
 			[JsonProperty("groundIntoDoublePlay")]
-			public int GroundIntoDoublePlay { get; set; }
+			public int? GroundIntoDoublePlay { get; set; }
 
 			[JsonProperty("groundIntoTriplePlay")]
-			public int GroundIntoTriplePlay { get; set; }
+			public int? GroundIntoTriplePlay { get; set; }
 
 			[JsonProperty("totalBases")]
-			public int TotalBases { get; set; }
+			public int? TotalBases { get; set; }
 
 			[JsonProperty("rbi")]
-			public int Rbi { get; set; }
+			public int? Rbi { get; set; }
 
 			[JsonProperty("leftOnBase")]
-			public int LeftOnBase { get; set; }
+			public int? LeftOnBase { get; set; }
 
 			[JsonProperty("sacBunts")]
-			public int SacBunts { get; set; }
+			public int? SacBunts { get; set; }
 
 			[JsonProperty("sacFlies")]
-			public int SacFlies { get; set; }
+			public int? SacFlies { get; set; }
 
 			[JsonProperty("catchersInterference")]
-			public int CatchersInterference { get; set; }
+			public int? CatchersInterference { get; set; }
 
 			[JsonProperty("pickoffs")]
-			public int Pickoffs { get; set; }
+			public int? Pickoffs { get; set; }
 
 			[JsonProperty("note", NullValueHandling = NullValueHandling.Ignore)]
 			public string Note { get; set; }
+
+			public bool IsDefault()
+			{
+				return !this.AtBats.HasValue
+						&& string.IsNullOrEmpty(this.Avg)
+						&& !this.BaseOnBalls.HasValue
+						&& !this.CatchersInterference.HasValue
+						&& !this.CaughtStealing.HasValue
+						&& !this.Doubles.HasValue
+						&& !this.FlyOuts.HasValue
+						&& !this.GamesPlayed.HasValue
+						&& !this.GroundIntoDoublePlay.HasValue
+						&& !this.GroundIntoTriplePlay.HasValue
+						&& !this.GroundOuts.HasValue
+						&& !this.HitByPitch.HasValue
+						&& !this.Hits.HasValue
+						&& !this.HomeRuns.HasValue
+						&& !this.IntentionalWalks.HasValue
+						&& !this.LeftOnBase.HasValue
+						&& string.IsNullOrEmpty(this.Obp)
+						&& string.IsNullOrEmpty(this.Ops)
+						&& !this.Pickoffs.HasValue
+						&& !this.Rbi.HasValue
+						&& !this.Runs.HasValue
+						&& !this.SacBunts.HasValue
+						&& !this.SacFlies.HasValue
+						&& string.IsNullOrEmpty(this.Slg)
+						&& string.IsNullOrEmpty(this.StolenBasePercentage)
+						&& !this.StolenBases.HasValue
+						&& !this.StrikeOuts.HasValue
+						&& !this.TotalBases.HasValue
+						&& !this.Triples.HasValue;
+			}
 		}
 
 		public class Fielding

@@ -101,7 +101,7 @@ namespace MlbStatsAcquisition.Model
 			modelBuilder.Entity<TeamSeason>().HasOptional(ts => ts.VenueSeason).WithMany(v => v.TeamSeasons).HasForeignKey(ts => new { ts.VenueID, ts.Season }).WillCascadeOnDelete(false);
 
 			modelBuilder.Entity<PlayerTeamSeason>().HasKey(pts => new { pts.PlayerID, pts.TeamID, pts.Season });
-			modelBuilder.Entity<PlayerTeamSeason>().HasRequired(pts => pts.Player).WithMany(p => p.PlayerSeasons).HasForeignKey(pts => pts.PlayerID).WillCascadeOnDelete(false);
+			modelBuilder.Entity<PlayerTeamSeason>().HasRequired(pts => pts.Player).WithMany(p => p.PlayerTeamSeasons).HasForeignKey(pts => pts.PlayerID).WillCascadeOnDelete(false);
 			modelBuilder.Entity<PlayerTeamSeason>().HasRequired(pts => pts.TeamSeason).WithMany(ts => ts.PlayerTeamSeasons).HasForeignKey(pts => new { pts.TeamID, pts.Season }).WillCascadeOnDelete(false);
 
 			modelBuilder.Entity<UmpireAssignment>().HasKey(us => new { us.GameID, us.UmpireID });

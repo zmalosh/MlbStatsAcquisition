@@ -9,7 +9,9 @@ namespace MlbStatsAcquisition.Model
 	public class Player : MlbStatsEntity
 	{
 		public int PlayerID { get; set; }
+		public string FullName { get; set; }
+		public string PlayerLink { get; set; }
 
-		public virtual ICollection<PlayerTeamSeason> PlayerSeasons { get; set; }
+		public virtual ICollection<PlayerTeamSeason> PlayerTeamSeasons { get; set; }
 	}
 }
