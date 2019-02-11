@@ -37,46 +37,51 @@ namespace MlbStatsAcquisition.Processor.Processors
 
 					if (feed.Officials != null && feed.Officials.Count > 0)
 					{
-						var officialIds = feed.Officials.Select(x => x.Official?.Id).Where(x => x.HasValue).ToList();
-						var dbUmpires = context.Umpires.Where(x => officialIds.Contains(x.UmpireID)).ToList();
-						var dbUmpireAssignments = context.UmpireAssignments.Where(x => x.GameID == this.GameId).ToList();
-						foreach (var feedOfficial in feed.Officials)
-						{
-							var dbUmpire = dbUmpires.SingleOrDefault(x => x.UmpireID == feedOfficial.Official.Id);
-							if (dbUmpire == null)
-							{
-								dbUmpire = new Umpire
-								{
-									UmpireID = feedOfficial.Official.Id,
-									UmpireName = feedOfficial.Official.FullName,
-									UmpireLink = feedOfficial.Official.Link
-								};
-								context.Umpires.Add(dbUmpire);
-								dbUmpires.Add(dbUmpire);
-							}
-
-							var dbUmpireAssignment = dbUmpireAssignments.SingleOrDefault(x => x.UmpireID == feedOfficial.Official.Id);
-							if (dbUmpireAssignment == null)
-							{
-								dbUmpireAssignment = new UmpireAssignment
-								{
-									Umpire = dbUmpire,
-									Game = dbGame,
-									UmpireType = UmpireType.Unknown
-								};
-								context.UmpireAssignments.Add(dbUmpireAssignment);
-								dbUmpireAssignments.Add(dbUmpireAssignment);
-							}
-
-							UmpireType umpireType = GetUmpireType(feedOfficial.OfficialType);
-							dbUmpireAssignment.UmpireType = umpireType;
-						}
+						this.ProcessUmpires(context, dbGame, feed.Officials);
 					}
 
 					var dbPlayerHittingBoxscores = context.PlayerHittingBoxscores.Where(x => x.GameID == this.GameId).ToDictionary(x => x.PlayerID);
 
 					context.SaveChanges();
 				}
+			}
+		}
+
+		private void ProcessUmpires(MlbStatsContext context, Game dbGame, List<Feeds.BoxscoreFeed.OfficialElement> feedUmpires)
+		{
+			var officialIds = feedUmpires.Select(x => x.Official?.Id).Where(x => x.HasValue).ToList();
+			var dbUmpires = context.Umpires.Where(x => officialIds.Contains(x.UmpireID)).ToList();
+			var dbUmpireAssignments = context.UmpireAssignments.Where(x => x.GameID == this.GameId).ToList();
+			foreach (var feedOfficial in feedUmpires)
+			{
+				var dbUmpire = dbUmpires.SingleOrDefault(x => x.UmpireID == feedOfficial.Official.Id);
+				if (dbUmpire == null)
+				{
+					dbUmpire = new Umpire
+					{
+						UmpireID = feedOfficial.Official.Id,
+						UmpireName = feedOfficial.Official.FullName,
+						UmpireLink = feedOfficial.Official.Link
+					};
+					context.Umpires.Add(dbUmpire);
+					dbUmpires.Add(dbUmpire);
+				}
+
+				var dbUmpireAssignment = dbUmpireAssignments.SingleOrDefault(x => x.UmpireID == feedOfficial.Official.Id);
+				if (dbUmpireAssignment == null)
+				{
+					dbUmpireAssignment = new UmpireAssignment
+					{
+						Umpire = dbUmpire,
+						Game = dbGame,
+						UmpireType = UmpireType.Unknown
+					};
+					context.UmpireAssignments.Add(dbUmpireAssignment);
+					dbUmpireAssignments.Add(dbUmpireAssignment);
+				}
+
+				UmpireType umpireType = GetUmpireType(feedOfficial.OfficialType);
+				dbUmpireAssignment.UmpireType = umpireType;
 			}
 		}
 
