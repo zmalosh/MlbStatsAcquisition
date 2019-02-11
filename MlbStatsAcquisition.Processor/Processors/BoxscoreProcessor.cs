@@ -50,16 +50,26 @@ namespace MlbStatsAcquisition.Processor.Processors
 							context.SaveChanges();
 						}
 
-						bool gameHasHittingBoxscores = feed.Teams.Away.Players.Any(x => x.Value.Stats.Batting != null && !x.Value.Stats.Batting.IsDefault())
-													&& feed.Teams.Home.Players.Any(x => x.Value.Stats.Batting != null && !x.Value.Stats.Batting.IsDefault());
+						bool gameHasHittingBoxscores = feed.Teams.Away.Players.Any(x => x.Value.Stats?.Batting != null && !x.Value.Stats.Batting.IsDefault())
+													&& feed.Teams.Home.Players.Any(x => x.Value.Stats?.Batting != null && !x.Value.Stats.Batting.IsDefault());
 
-						if (gameHasHittingBoxscores)
+						bool gameHasPitchingBoxscores = feed.Teams.Away.Players.Any(x => x.Value.Stats?.Pitching != null && !x.Value.Stats.Pitching.IsDefault())
+													&& feed.Teams.Home.Players.Any(x => x.Value.Stats?.Pitching != null && !x.Value.Stats.Pitching.IsDefault());
+
+						// ASSUME FINISHED GAME WILL HAVE HITTING AND PITCHING DATA... FIELDING NOT SO MUCH
+						if (gameHasHittingBoxscores && gameHasPitchingBoxscores)
 						{
 							var dbPlayerHittingBoxscores = context.PlayerHittingBoxscores.Where(x => x.GameID == this.GameId).ToDictionary(x => x.PlayerID);
 							var awayHitters = feed.Teams?.Away?.Players.Where(x => x.Value.Stats?.Batting != null && !x.Value.Stats.Batting.IsDefault()).Select(y => y.Value).ToList();
 							ProcessHitterBoxscores(context, dbGame.AwayTeamID.Value, dbGame.Season, dbPlayerHittingBoxscores, awayHitters);
 							var homeHitters = feed.Teams?.Home?.Players.Where(x => x.Value.Stats?.Batting != null && !x.Value.Stats.Batting.IsDefault()).Select(y => y.Value).ToList();
 							ProcessHitterBoxscores(context, dbGame.HomeTeamID.Value, dbGame.Season, dbPlayerHittingBoxscores, homeHitters);
+
+							var dbPlayerPitchingBoxscores = context.PlayerPitchingBoxscores.Where(x => x.GameID == this.GameId).ToDictionary(x => x.PlayerID);
+							var awayPitchers = feed.Teams?.Away?.Players.Where(x => x.Value.Stats?.Pitching != null && !x.Value.Stats.Pitching.IsDefault()).Select(y => y.Value).ToList();
+							ProcessPitcherBoxscores(context, dbGame.AwayTeamID.Value, dbGame.Season, dbPlayerPitchingBoxscores, awayPitchers);
+							var homePitchers = feed.Teams?.Home?.Players.Where(x => x.Value.Stats?.Pitching != null && !x.Value.Stats.Pitching.IsDefault()).Select(y => y.Value).ToList();
+							ProcessPitcherBoxscores(context, dbGame.HomeTeamID.Value, dbGame.Season, dbPlayerPitchingBoxscores, homePitchers);
 						}
 					}
 
@@ -231,6 +241,126 @@ namespace MlbStatsAcquisition.Processor.Processors
 						dbBoxscore.CatcherInterferences = (byte?)feedBox.CatchersInterference;
 						dbBoxscore.GroundIntoDoublePlay = (byte?)feedBox.GroundIntoDoublePlay;
 						dbBoxscore.GroundIntoTriplePlay = (byte?)feedBox.GroundIntoTriplePlay;
+					}
+				}
+			}
+		}
+
+		private void ProcessPitcherBoxscores(MlbStatsContext context, int teamId, int season,
+			Dictionary<int, PlayerPitchingBoxscore> dbGameBoxscores,
+			List<Feeds.BoxscoreFeed.GamePlayer> feedPlayers)
+		{
+			foreach (var feedPlayer in feedPlayers)
+			{
+				if (feedPlayer?.Stats?.Pitching != null)
+				{
+					bool updateStats = false;
+					if (!dbGameBoxscores.TryGetValue(feedPlayer.Person.Id, out PlayerPitchingBoxscore dbBoxscore))
+					{
+						updateStats = true;
+						dbBoxscore = new PlayerPitchingBoxscore
+						{
+							GameID = this.GameId,
+							TeamID = teamId,
+							PlayerID = feedPlayer.Person.Id,
+							Season = season
+						};
+						context.PlayerPitchingBoxscores.Add(dbBoxscore);
+						dbGameBoxscores.Add(feedPlayer.Person.Id, dbBoxscore);
+					}
+
+					var feedBox = feedPlayer.Stats.Pitching;
+
+					// NOT NEW - STATS MUST BE DIFFERENT TO UPDATE
+					// MAKE SURE NO UPDATES HAVE BEEN MADE TO STATS
+					if (!updateStats)
+					{
+						updateStats = feedBox.AirOuts != dbBoxscore.AirOuts
+										|| feedBox.AtBats != dbBoxscore.AtBats
+										|| feedBox.Balls != dbBoxscore.Balls
+										|| feedBox.BaseOnBalls != dbBoxscore.BaseOnBalls
+										|| feedBox.BattersFaced != dbBoxscore.BattersFaced
+										|| feedBox.HitBatsmen != dbBoxscore.BattersHit
+										|| feedBox.Hits != dbBoxscore.Hits
+										|| feedBox.HomeRuns != dbBoxscore.HomeRuns
+										|| feedBox.InheritedRunners != dbBoxscore.InheritedRunners
+										|| feedBox.InheritedRunnersScored != dbBoxscore.InheritedRunnersScored
+										|| feedBox.InningsPitched != dbBoxscore.InningsPitched
+										|| feedBox.IntentionalWalks != dbBoxscore.IntentionalWalks
+										|| feedBox.PitchesThrown != dbBoxscore.PitchCount
+										|| feedBox.Outs != dbBoxscore.Outs
+										|| feedBox.Pickoffs != dbBoxscore.Pickoffs
+										|| feedBox.Rbi != dbBoxscore.RunsBattedIn
+										|| feedBox.Runs != dbBoxscore.Runs
+										|| feedBox.SacBunts != dbBoxscore.SacBunts
+										|| feedBox.SacFlies != dbBoxscore.SacFlies
+										|| feedBox.StolenBases != dbBoxscore.StolenBases
+										|| feedBox.StrikeOuts != dbBoxscore.StrikeOuts
+										|| feedBox.Strikes != dbBoxscore.Strikes
+										|| feedBox.Triples != dbBoxscore.Triples
+										|| feedBox.WildPitches != dbBoxscore.WildPitches
+										|| feedBox.GroundOuts != dbBoxscore.GroundOuts
+										|| feedBox.CaughtStealing != dbBoxscore.CaughtStealing
+										|| feedBox.EarnedRuns != dbBoxscore.EarnedRuns
+										|| feedBox.Doubles != dbBoxscore.Doubles
+										|| feedBox.CatchersInterference != dbBoxscore.CathersInterference
+										|| feedBox.FlyOuts != dbBoxscore.FlyOuts
+										|| (feedBox.Holds == 1) != dbBoxscore.IsHold
+										|| (feedBox.Losses == 1) != dbBoxscore.IsLoss
+										|| (feedBox.SaveOpportunities == 1) != dbBoxscore.IsSaveOpp
+										|| (feedBox.Saves == 1) != dbBoxscore.IsSave
+										|| (feedBox.Shutouts == 1) != dbBoxscore.IsShutout
+										|| (feedBox.Wins == 1) != dbBoxscore.IsWin
+										|| (feedBox.GamesFinished == 1) != dbBoxscore.IsFinish
+										|| (feedBox.GamesStarted == 1) != dbBoxscore.IsStart
+										|| (feedBox.GamesPitched == 1) != dbBoxscore.GamePitched
+										|| (feedBox.BlownSaves == 1) != dbBoxscore.IsBlownSave
+										|| (feedBox.CompleteGames == 1) != dbBoxscore.IsCompleteGame;
+					}
+
+					if (updateStats)
+					{
+						dbBoxscore.AirOuts = (byte?)feedBox.AirOuts;
+						dbBoxscore.AtBats = (byte?)feedBox.AtBats;
+						dbBoxscore.Balls = (byte?)feedBox.Balls;
+						dbBoxscore.BaseOnBalls = (byte?)feedBox.BaseOnBalls;
+						dbBoxscore.BattersFaced = (byte?)feedBox.BattersFaced;
+						dbBoxscore.BattersHit = (byte?)feedBox.HitBatsmen;
+						dbBoxscore.Hits = (byte?)feedBox.Hits;
+						dbBoxscore.HomeRuns = (byte?)feedBox.HomeRuns;
+						dbBoxscore.InheritedRunners = (byte?)feedBox.InheritedRunners;
+						dbBoxscore.InheritedRunnersScored = (byte?)feedBox.InheritedRunnersScored;
+						dbBoxscore.IntentionalWalks = (byte?)feedBox.IntentionalWalks;
+						dbBoxscore.PitchCount = (byte?)feedBox.PitchesThrown;
+						dbBoxscore.Outs = (byte?)feedBox.Outs;
+						dbBoxscore.Pickoffs = (byte?)feedBox.Pickoffs;
+						dbBoxscore.RunsBattedIn = (byte?)feedBox.Rbi;
+						dbBoxscore.Runs = (byte?)feedBox.Runs;
+						dbBoxscore.SacBunts = (byte?)feedBox.SacBunts;
+						dbBoxscore.SacFlies = (byte?)feedBox.SacFlies;
+						dbBoxscore.StolenBases = (byte?)feedBox.StolenBases;
+						dbBoxscore.StrikeOuts = (byte?)feedBox.StrikeOuts;
+						dbBoxscore.Strikes = (byte?)feedBox.Strikes;
+						dbBoxscore.Triples = (byte?)feedBox.Triples;
+						dbBoxscore.WildPitches = (byte?)feedBox.WildPitches;
+						dbBoxscore.GroundOuts = (byte?)feedBox.GroundOuts;
+						dbBoxscore.CaughtStealing = (byte?)feedBox.CaughtStealing;
+						dbBoxscore.EarnedRuns = (byte?)feedBox.EarnedRuns;
+						dbBoxscore.Doubles = (byte?)feedBox.Doubles;
+						dbBoxscore.CathersInterference = (byte?)feedBox.CatchersInterference;
+						dbBoxscore.FlyOuts = (byte?)feedBox.FlyOuts;
+						dbBoxscore.InningsPitched = feedBox.InningsPitched;
+						dbBoxscore.IsHold = (feedBox.Holds == 1);
+						dbBoxscore.IsLoss = (feedBox.Losses == 1);
+						dbBoxscore.IsSaveOpp = (feedBox.SaveOpportunities == 1);
+						dbBoxscore.IsSave = (feedBox.Saves == 1);
+						dbBoxscore.IsShutout = (feedBox.Shutouts == 1);
+						dbBoxscore.IsWin = (feedBox.Wins == 1);
+						dbBoxscore.IsFinish = (feedBox.GamesFinished == 1);
+						dbBoxscore.IsStart = (feedBox.GamesStarted == 1);
+						dbBoxscore.GamePitched = (feedBox.GamesPitched == 1);
+						dbBoxscore.IsBlownSave = (feedBox.BlownSaves == 1);
+						dbBoxscore.IsCompleteGame = (feedBox.CompleteGames == 1);
 					}
 				}
 			}
