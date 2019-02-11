@@ -11,10 +11,7 @@ namespace MlbStatsAcquisition.Model
 		public int DivisionID { get; set; }
 		public string DivisionName { get; set; }
 		public string DivisionLink { get; set; }
-		public int LeagueID { get; set; }
 
-		public virtual League League { get; set; }
-		public virtual ICollection<Team> Teams { get; set; }
 		public virtual ICollection<DivisionSeason> DivisionSeasons { get; set; }
 	}
 }

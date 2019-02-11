@@ -13,8 +13,6 @@ namespace MlbStatsAcquisition.Model
 		public string VenueName { get; set; }
 		public string VenueLink { get; set; }
 
-		public virtual ICollection<Team> Teams { get; set; }
 		public virtual ICollection<VenueSeason> VenueSeasons { get; set; }
-		public virtual ICollection<Game> Games { get; set; }
 	}
 }

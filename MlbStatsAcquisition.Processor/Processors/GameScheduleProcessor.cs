@@ -130,7 +130,6 @@ namespace MlbStatsAcquisition.Processor.Processors
 									dbAwayTeam = new Model.Team
 									{
 										TeamID = feedAwayTeam.Id,
-										AssociationID = associationId,
 										IsActive = false,
 										IsAllStar = false,
 										FirstSeason = null,
@@ -171,7 +170,6 @@ namespace MlbStatsAcquisition.Processor.Processors
 									dbHomeTeam = new Model.Team
 									{
 										TeamID = feedHomeTeam.Id,
-										AssociationID = associationId,
 										IsActive = false,
 										IsAllStar = false,
 										FirstSeason = null,

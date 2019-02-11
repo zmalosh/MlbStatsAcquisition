@@ -66,8 +66,7 @@ namespace MlbStatsAcquisition.Processor.Processors
 					{
 						LeagueID = feedTeam.League.Id.Value,
 						LeagueName = feedTeam.League.Name,
-						LeagueLink = feedTeam.League.Link,
-						Association = dbAssociation
+						LeagueLink = feedTeam.League.Link
 					};
 					dbLeagues.Add(dbLeague.LeagueID, dbLeague);
 					context.Leagues.Add(dbLeague);
@@ -80,8 +79,7 @@ namespace MlbStatsAcquisition.Processor.Processors
 					{
 						DivisionID = feedTeam.Division.Id.Value,
 						DivisionName = feedTeam.Division.Name,
-						DivisionLink = feedTeam.Division.Link,
-						League = dbLeague
+						DivisionLink = feedTeam.Division.Link
 					};
 					dbDivisions.Add(dbDivision.DivisionID, dbDivision);
 					context.Divisions.Add(dbDivision);
@@ -107,8 +105,7 @@ namespace MlbStatsAcquisition.Processor.Processors
 					{
 						LeagueID = feedTeam.SpringLeague.Id.Value,
 						LeagueName = feedTeam.SpringLeague.Name,
-						LeagueLink = feedTeam.SpringLeague.Link,
-						Association = dbAssociation
+						LeagueLink = feedTeam.SpringLeague.Link
 					};
 					dbLeagues.Add(dbSpringLeague.LeagueID, dbSpringLeague);
 					context.Leagues.Add(dbSpringLeague);
@@ -131,12 +128,6 @@ namespace MlbStatsAcquisition.Processor.Processors
 					dbTeam = new Model.Team
 					{
 						TeamID = feedTeam.Id,
-						Association = dbAssociation,
-						League = dbLeague,
-						SpringLeague = dbSpringLeague,
-						Venue = dbVenue,
-						Division = dbDivision,
-						ParentOrg = dbParentOrg,
 						FileCode = feedTeam.FileCode,
 						FirstSeason = feedTeam.FirstYearOfPlay,
 						IsActive = feedTeam.Active,
@@ -172,59 +163,6 @@ namespace MlbStatsAcquisition.Processor.Processors
 						dbTeam.TeamFullName = feedTeam.Name;
 						dbTeam.TeamLocation = feedTeam.LocationName;
 						dbTeam.TeamName = feedTeam.Name;
-					}
-
-					if (dbTeam.AssociationID != dbAssociation.AssociationID)
-					{
-						dbTeam.Association = dbAssociation;
-					}
-
-					if (dbLeague == null)
-					{
-						if (dbTeam.LeagueID.HasValue)
-						{
-							dbTeam.LeagueID = null;
-						}
-					}
-					else if (dbTeam.LeagueID != dbLeague.LeagueID)
-					{
-						dbTeam.League = dbLeague;
-					}
-
-					if (dbDivision == null)
-					{
-						if (dbTeam.DivisionID.HasValue)
-						{
-							dbTeam.DivisionID = null;
-						}
-					}
-					else if (dbTeam.DivisionID != dbDivision.DivisionID)
-					{
-						dbTeam.Division = dbDivision;
-					}
-
-					if (dbVenue == null)
-					{
-						if (dbTeam.VenueID.HasValue)
-						{
-							dbTeam.VenueID = null;
-						}
-					}
-					else if (dbTeam.VenueID != dbVenue.VenueID)
-					{
-						dbTeam.Venue = dbVenue;
-					}
-
-					if (dbSpringLeague == null)
-					{
-						if (dbTeam.SpringLeagueID.HasValue)
-						{
-							dbTeam.SpringLeagueID = null;
-						}
-					}
-					else if (dbTeam.SpringLeagueID != dbSpringLeague.LeagueID)
-					{
-						dbTeam.SpringLeague = dbSpringLeague;
 					}
 				}
 

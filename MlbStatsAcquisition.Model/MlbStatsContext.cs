@@ -30,14 +30,17 @@ namespace MlbStatsAcquisition.Model
 		public DbSet<League> Leagues { get; set; }
 		public DbSet<Division> Divisions { get; set; }
 		public DbSet<Team> Teams { get; set; }
+		public DbSet<Player> Players { get; set; }
 
 		public DbSet<VenueSeason> VenueSeasons { get; set; }
 		public DbSet<AssociationSeason> AssociationSeasons { get; set; }
 		public DbSet<LeagueSeason> LeagueSeasons { get; set; }
 		public DbSet<DivisionSeason> DivisionSeasons { get; set; }
 		public DbSet<TeamSeason> TeamSeasons { get; set; }
+		public DbSet<PlayerTeamSeason> PlayerTeamSeasons { get; set; }
 
 		public DbSet<Game> Games { get; set; }
+		public DbSet<PlayerHittingBoxscore> PlayerHittingBoxscores { get; set; }
 		//public DbSet<GamePlay> GamePlays { get; set; }
 
 		protected override void OnModelCreating(DbModelBuilder modelBuilder)
@@ -64,18 +67,12 @@ namespace MlbStatsAcquisition.Model
 			modelBuilder.Entity<Association>().HasKey(a => a.AssociationID).Property(a => a.AssociationID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
 
 			modelBuilder.Entity<League>().HasKey(lg => lg.LeagueID).Property(lg => lg.LeagueID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
-			modelBuilder.Entity<League>().HasRequired(lg => lg.Association).WithMany(a => a.Leagues).HasForeignKey(lg => lg.AssociationID).WillCascadeOnDelete(false);
 
 			modelBuilder.Entity<Division>().HasKey(d => d.DivisionID).Property(d => d.DivisionID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
-			modelBuilder.Entity<Division>().HasRequired(d => d.League).WithMany(lg => lg.Divisions).HasForeignKey(d => d.LeagueID).WillCascadeOnDelete(false);
 
 			modelBuilder.Entity<Team>().HasKey(t => t.TeamID).Property(t => t.TeamID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
-			modelBuilder.Entity<Team>().HasOptional(t => t.Association).WithMany(a => a.Teams).HasForeignKey(t => t.AssociationID).WillCascadeOnDelete(false);
-			modelBuilder.Entity<Team>().HasOptional(t => t.League).WithMany(lg => lg.Teams).HasForeignKey(t => t.LeagueID).WillCascadeOnDelete(false);
-			modelBuilder.Entity<Team>().HasOptional(t => t.Division).WithMany(lg => lg.Teams).HasForeignKey(t => t.DivisionID).WillCascadeOnDelete(false);
-			modelBuilder.Entity<Team>().HasOptional(t => t.Venue).WithMany(lg => lg.Teams).HasForeignKey(t => t.VenueID).WillCascadeOnDelete(false);
-			modelBuilder.Entity<Team>().HasOptional(t => t.SpringLeague).WithMany(t => t.SpringTeams).HasForeignKey(t => t.SpringLeagueID).WillCascadeOnDelete(false);
-			modelBuilder.Entity<Team>().HasOptional(t => t.ParentOrg).WithMany(t => t.ChildOrgTeams).HasForeignKey(t => t.ParentOrgID).WillCascadeOnDelete(false);
+
+			modelBuilder.Entity<Player>().HasKey(p => p.PlayerID).Property(p => p.PlayerID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
 
 			modelBuilder.Entity<VenueSeason>().HasKey(vs => new { vs.VenueID, vs.Season });
 			modelBuilder.Entity<VenueSeason>().HasRequired(vs => vs.Venue).WithMany(v => v.VenueSeasons).HasForeignKey(vs => vs.VenueID).WillCascadeOnDelete(false);
@@ -100,15 +97,19 @@ namespace MlbStatsAcquisition.Model
 			modelBuilder.Entity<TeamSeason>().HasOptional(ts => ts.ParentOrgSeason).WithMany(t => t.ChildOrgSeasons).HasForeignKey(ts => new { ts.ParentOrgID, ts.Season }).WillCascadeOnDelete(false);
 			modelBuilder.Entity<TeamSeason>().HasOptional(ts => ts.VenueSeason).WithMany(v => v.TeamSeasons).HasForeignKey(ts => new { ts.VenueID, ts.Season }).WillCascadeOnDelete(false);
 
+			modelBuilder.Entity<PlayerTeamSeason>().HasKey(pts => new { pts.PlayerID, pts.TeamID, pts.Season });
+			modelBuilder.Entity<PlayerTeamSeason>().HasRequired(pts => pts.Player).WithMany(p => p.PlayerSeasons).HasForeignKey(pts => pts.PlayerID).WillCascadeOnDelete(false);
+			modelBuilder.Entity<PlayerTeamSeason>().HasRequired(pts => pts.TeamSeason).WithMany(ts => ts.PlayerTeamSeasons).HasForeignKey(pts => new { pts.TeamID, pts.Season }).WillCascadeOnDelete(false);
+
 			modelBuilder.Entity<Game>().HasKey(g => g.GameID).Property(g => g.GameID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
-			modelBuilder.Entity<Game>().HasRequired(g => g.Association).WithMany(a => a.Games).HasForeignKey(g => g.AssociationID).WillCascadeOnDelete(false);
-			modelBuilder.Entity<Game>().HasOptional(g => g.HomeTeam).WithMany(t => t.HomeGames).HasForeignKey(g => g.HomeTeamID).WillCascadeOnDelete(false);
-			modelBuilder.Entity<Game>().HasOptional(g => g.AwayTeam).WithMany(t => t.AwayGames).HasForeignKey(g => g.AwayTeamID).WillCascadeOnDelete(false);
-			modelBuilder.Entity<Game>().HasOptional(g => g.Venue).WithMany(v => v.Games).HasForeignKey(g => g.VenueID).WillCascadeOnDelete(false);
 			modelBuilder.Entity<Game>().HasRequired(g => g.AssociationSeason).WithMany(a => a.Games).HasForeignKey(g => new { g.AssociationID, g.Season }).WillCascadeOnDelete(false);
 			modelBuilder.Entity<Game>().HasOptional(g => g.HomeTeamSeason).WithMany(t => t.HomeGames).HasForeignKey(g => new { g.HomeTeamID, g.Season }).WillCascadeOnDelete(false);
 			modelBuilder.Entity<Game>().HasOptional(g => g.AwayTeamSeason).WithMany(t => t.AwayGames).HasForeignKey(g => new { g.AwayTeamID, g.Season }).WillCascadeOnDelete(false);
 			modelBuilder.Entity<Game>().HasOptional(g => g.VenueSeason).WithMany(v => v.Games).HasForeignKey(g => new { g.VenueID, g.Season }).WillCascadeOnDelete(false);
+
+			modelBuilder.Entity<PlayerHittingBoxscore>().HasKey(box => new { box.GameID, box.PlayerID });
+			modelBuilder.Entity<PlayerHittingBoxscore>().HasRequired(box => box.Game).WithMany(g => g.PlayerHittingBoxscores).HasForeignKey(box => box.GameID).WillCascadeOnDelete(false);
+			modelBuilder.Entity<PlayerHittingBoxscore>().HasRequired(box => box.PlayerTeamSeason).WithMany(g => g.PlayerHittingBoxscores).HasForeignKey(box => new { box.PlayerID, box.TeamID, box.Season }).WillCascadeOnDelete(false);
 
 			//modelBuilder.Entity<GamePlay>().HasKey(g => g.GamePlayID).Property(g => g.GamePlayID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
 			//modelBuilder.Entity<GamePlay>().HasRequired(g => g.Game).WithMany(g => g.Plays).HasForeignKey(g => g.GameID).WillCascadeOnDelete(false);

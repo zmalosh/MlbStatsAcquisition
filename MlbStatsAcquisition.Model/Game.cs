@@ -46,16 +46,12 @@ namespace MlbStatsAcquisition.Model
 		public DateTime? ResumeDate { get; set; }
 		public DateTime? ResumedFrom { get; set; }
 
-		public virtual Association Association { get; set; }
-		public virtual Team AwayTeam { get; set; }
-		public virtual Team HomeTeam { get; set; }
-		public virtual Venue Venue { get; set; }
-
 		public virtual AssociationSeason AssociationSeason { get; set; }
 		public virtual TeamSeason AwayTeamSeason { get; set; }
 		public virtual TeamSeason HomeTeamSeason { get; set; }
 		public virtual VenueSeason VenueSeason { get; set; }
 
 		//public virtual ICollection<GamePlay> Plays { get; set; }
+		public virtual ICollection<PlayerHittingBoxscore> PlayerHittingBoxscores { get; set; }
 	}
 }
