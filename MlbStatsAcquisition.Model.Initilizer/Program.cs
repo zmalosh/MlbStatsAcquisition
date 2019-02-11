@@ -46,7 +46,7 @@ namespace MlbStatsAcquisition.Model.Initilizer
 				}
 
 				processors = new List<Processor.Processors.IProcessor>();
-				for (int i = 2019; i >= 2012; i--)
+				for (int i = 2018; i >= 2012; i--)
 				{
 					processors.Add(new Processor.Processors.TeamsProcessor(i));
 				}
@@ -57,22 +57,24 @@ namespace MlbStatsAcquisition.Model.Initilizer
 			}
 
 			var associationIds = context.Associations.Where(x => x.IsEnabled).Select(x => x.AssociationID).ToList();
-			for (int i = 2019; i >= 2015; i--)
+
+			//ITERATE OVER CALENDAR YEARS, NOT SEASONS
+			for (int year = 2018; year >= 2015; year--)
 			{
-				processor = new Processor.Processors.GameScheduleProcessor(i, associationIds);
+				processor = new Processor.Processors.GameScheduleProcessor(year, associationIds);
 				processor.Run(context);
 				context = GetNewContext();
-			}
 
-			processors = context.Games.Where(x => x.AssociationID != 1)
-										.ToList()
-										.Select(x => (Processor.Processors.IProcessor)new Processor.Processors.BoxscoreProcessor(x.GameID))
-										.ToList();
-			processors.ForEach(x =>
-			{
-				x.Run(context);
-				//context = GetNewContext();
-			});
+				processors = context.Games.Where(x => x.GameTime.Year == year)
+											.ToList()
+											.Select(x => (Processor.Processors.IProcessor)new Processor.Processors.BoxscoreProcessor(x.GameID))
+											.ToList();
+				processors.ForEach(x =>
+				{
+					x.Run(context);
+					context = GetNewContext();
+				});
+			}
 
 			context.Dispose();
 		}

@@ -66,18 +66,15 @@ namespace MlbStatsAcquisition.Model
 			modelBuilder.Entity<Position>().HasKey(p => p.PositionAbbr).Property(p => p.PositionAbbr).HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
 			modelBuilder.Entity<GameType>().HasKey(t => t.GameTypeID).Property(t => t.GameTypeID).HasMaxLength(1).HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
 
+			modelBuilder.Entity<RefUmpireType>().ToTable("UmpireTypes");
+			modelBuilder.Entity<RefUmpireType>().HasKey(ut => ut.UmpireType).Property(ut => ut.UmpireType).HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
+
 			modelBuilder.Entity<Venue>().HasKey(v => v.VenueID).Property(v => v.VenueID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
-
 			modelBuilder.Entity<Association>().HasKey(a => a.AssociationID).Property(a => a.AssociationID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
-
 			modelBuilder.Entity<League>().HasKey(lg => lg.LeagueID).Property(lg => lg.LeagueID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
-
 			modelBuilder.Entity<Division>().HasKey(d => d.DivisionID).Property(d => d.DivisionID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
-
 			modelBuilder.Entity<Team>().HasKey(t => t.TeamID).Property(t => t.TeamID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
-
 			modelBuilder.Entity<Player>().HasKey(p => p.PlayerID).Property(p => p.PlayerID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
-
 			modelBuilder.Entity<Umpire>().HasKey(u => u.UmpireID).Property(u => u.UmpireID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
 
 			modelBuilder.Entity<VenueSeason>().HasKey(vs => new { vs.VenueID, vs.Season });
@@ -108,10 +105,10 @@ namespace MlbStatsAcquisition.Model
 			modelBuilder.Entity<PlayerTeamSeason>().HasRequired(pts => pts.TeamSeason).WithMany(ts => ts.PlayerTeamSeasons).HasForeignKey(pts => new { pts.TeamID, pts.Season }).WillCascadeOnDelete(false);
 
 			modelBuilder.Entity<UmpireAssignment>().HasKey(us => new { us.GameID, us.UmpireID });
-			modelBuilder.Entity<UmpireAssignment>().HasRequired(ua => ua.Umpire).WithMany(u => u.UmpireAssignments).HasForeignKey(ua => ua.UmpireID);
-			modelBuilder.Entity<UmpireAssignment>().HasRequired(ua => ua.Game).WithMany(g => g.UmpireAssignments).HasForeignKey(ua => ua.UmpireID);
-			modelBuilder.Entity<UmpireAssignment>().HasRequired(ua => ua.RefUmpireType).WithMany(rut => rut.UmpireAssignments).HasForeignKey(ua => ua.RefUmpireType);
-			
+			modelBuilder.Entity<UmpireAssignment>().HasRequired(ua => ua.Umpire).WithMany(u => u.UmpireAssignments).HasForeignKey(ua => ua.UmpireID).WillCascadeOnDelete(false);
+			modelBuilder.Entity<UmpireAssignment>().HasRequired(ua => ua.Game).WithMany(g => g.UmpireAssignments).HasForeignKey(ua => ua.GameID).WillCascadeOnDelete(false);
+			modelBuilder.Entity<UmpireAssignment>().HasRequired(ua => ua.RefUmpireType).WithMany(rut => rut.UmpireAssignments).HasForeignKey(ua => ua.UmpireType).WillCascadeOnDelete(false);
+
 			modelBuilder.Entity<Game>().HasKey(g => g.GameID).Property(g => g.GameID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
 			modelBuilder.Entity<Game>().HasRequired(g => g.AssociationSeason).WithMany(a => a.Games).HasForeignKey(g => new { g.AssociationID, g.Season }).WillCascadeOnDelete(false);
 			modelBuilder.Entity<Game>().HasOptional(g => g.HomeTeamSeason).WithMany(t => t.HomeGames).HasForeignKey(g => new { g.HomeTeamID, g.Season }).WillCascadeOnDelete(false);
