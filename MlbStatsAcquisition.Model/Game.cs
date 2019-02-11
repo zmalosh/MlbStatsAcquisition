@@ -51,6 +51,8 @@ namespace MlbStatsAcquisition.Model
 		public virtual TeamSeason HomeTeamSeason { get; set; }
 		public virtual VenueSeason VenueSeason { get; set; }
 
+		public virtual ICollection<UmpireAssignment> UmpireAssignments { get; set; }
+
 		//public virtual ICollection<GamePlay> Plays { get; set; }
 		public virtual ICollection<PlayerHittingBoxscore> PlayerHittingBoxscores { get; set; }
 	}

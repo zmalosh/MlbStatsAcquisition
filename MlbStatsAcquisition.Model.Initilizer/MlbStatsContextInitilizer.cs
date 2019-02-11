@@ -12,6 +12,14 @@ namespace MlbStatsAcquisition.Model.Initilizer
 		public override void InitializeDatabase(MlbStatsContext context)
 		{
 			base.InitializeDatabase(context);
+
+			context.UmpireTypes.Add(new RefUmpireType { UmpireType = UmpireType.FirstBase,  Name = "First Base" });
+			context.UmpireTypes.Add(new RefUmpireType { UmpireType = UmpireType.SecondBase, Name = "Second Base" });
+			context.UmpireTypes.Add(new RefUmpireType { UmpireType = UmpireType.ThirdBase,  Name = "Third Base" });
+			context.UmpireTypes.Add(new RefUmpireType { UmpireType = UmpireType.HomePlate,  Name = "Home Plate" });
+			context.UmpireTypes.Add(new RefUmpireType { UmpireType = UmpireType.LeftField,  Name = "Left Field" });
+			context.UmpireTypes.Add(new RefUmpireType { UmpireType = UmpireType.RightField, Name = "Right Field" });
+
 			context.SaveChanges();
 		}
 	}
