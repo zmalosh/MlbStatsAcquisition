@@ -23,7 +23,29 @@ namespace MlbStatsAcquisition.Processor.Processors
 			using (var client = new WebClient())
 			{
 				var url = Feeds.BoxscoreFeed.GetFeedUrl(this.GameId);
-				var rawJson = client.DownloadString(url);
+				string rawJson = null;
+				try
+				{
+					rawJson = client.DownloadString(url);
+				}
+				catch (WebException ex)
+				{
+					try
+					{
+						rawJson = client.DownloadString(url);
+					}
+					catch (Exception ex2)
+					{
+						string dir = "FailedGameIDs";
+						if (!System.IO.Directory.Exists(dir))
+						{
+							System.IO.Directory.CreateDirectory(dir);
+						}
+						var filePath = string.Format($"{dir}\\{this.GameId}.nobueno");
+						System.IO.File.Create(filePath);
+						return;
+					}
+				}
 				feed = Feeds.BoxscoreFeed.FromJson(rawJson);
 				Console.WriteLine($"{this.GameId} - {feed.Teams.Away.Team.Abbreviation.PadRight(3, ' ')} ({feed.Teams.Away.Team.Record?.GamesPlayed}) @{feed.Teams.Home.Team.Abbreviation.PadRight(3, ' ')} ({feed.Teams.Home.Team.Record?.GamesPlayed})");
 
@@ -42,13 +64,9 @@ namespace MlbStatsAcquisition.Processor.Processors
 
 					if (feed.Teams.Away?.Players != null && feed.Teams.Home?.Players != null)
 					{
-						bool isAwayPlayerUpdate = ProcessPlayerTeamSeasons(context, dbGame.AwayTeamID.Value, dbGame.Season, feed.Teams.Away.Players.Values);
-						bool isHomePlayerUpdate = ProcessPlayerTeamSeasons(context, dbGame.HomeTeamID.Value, dbGame.Season, feed.Teams.Home.Players.Values);
-						bool isPlayerUpdate = isAwayPlayerUpdate || isHomePlayerUpdate;
-						if (isPlayerUpdate)
-						{
-							context.SaveChanges();
-						}
+						ProcessPlayerTeamSeasons(context, dbGame.AwayTeamID.Value, dbGame.Season, feed.Teams.Away.Players.Values);
+						ProcessPlayerTeamSeasons(context, dbGame.HomeTeamID.Value, dbGame.Season, feed.Teams.Home.Players.Values);
+
 
 						bool gameHasHittingBoxscores = feed.Teams.Away.Players.Any(x => x.Value.Stats?.Batting != null && !x.Value.Stats.Batting.IsDefault())
 													&& feed.Teams.Home.Players.Any(x => x.Value.Stats?.Batting != null && !x.Value.Stats.Batting.IsDefault());
@@ -116,7 +134,7 @@ namespace MlbStatsAcquisition.Processor.Processors
 			}
 		}
 
-		private bool ProcessPlayerTeamSeasons(MlbStatsContext context, int teamId, int season, IEnumerable<Feeds.BoxscoreFeed.GamePlayer> feedPlayers)
+		private void ProcessPlayerTeamSeasons(MlbStatsContext context, int teamId, int season, IEnumerable<Feeds.BoxscoreFeed.GamePlayer> feedPlayers)
 		{
 			var playerIds = feedPlayers.Select(x => x.Person.Id).ToList();
 			var dbPlayers = context.Players.Where(x => playerIds.Contains(x.PlayerID)).ToDictionary(x => x.PlayerID);
@@ -124,7 +142,7 @@ namespace MlbStatsAcquisition.Processor.Processors
 			if (dbPlayers.Count == playerIds.Count && dbPlayerTeamSeasons.Count == playerIds.Count)
 			{
 				// NO DB CHANGES NEEDED
-				return false;
+				return;
 			}
 			if (dbPlayers.Count != playerIds.Count || dbPlayerTeamSeasons.Count != playerIds.Count)
 			{
@@ -156,8 +174,8 @@ namespace MlbStatsAcquisition.Processor.Processors
 						dbPlayerTeamSeasons.Add(dbPlayer.PlayerID, dbPlayerTeamSeason);
 					}
 				}
+				context.SaveChanges();
 			}
-			return true;
 		}
 
 		private void ProcessHitterBoxscores(MlbStatsContext context, int teamId, int season,
