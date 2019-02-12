@@ -8,6 +8,8 @@ namespace MlbStatsAcquisition.Model.Initilizer
 {
 	class Program
 	{
+		private const int MaxYear = 2017;
+		private const int MinYear = 2016;
 		static void Main(string[] args)
 		{
 			var context = GetNewContext();
@@ -46,7 +48,7 @@ namespace MlbStatsAcquisition.Model.Initilizer
 				}
 
 				processors = new List<Processor.Processors.IProcessor>();
-				for (int i = 2018; i >= 2012; i--)
+				for (int i = MaxYear; i >= MinYear; i--)
 				{
 					processors.Add(new Processor.Processors.TeamsProcessor(i));
 				}
@@ -59,7 +61,7 @@ namespace MlbStatsAcquisition.Model.Initilizer
 			var associationIds = context.Associations.Where(x => x.IsEnabled).Select(x => x.AssociationID).ToList();
 
 			//ITERATE OVER CALENDAR YEARS, NOT SEASONS
-			for (int year = 2018; year >= 2015; year--)
+			for (int year = MaxYear; year >= MinYear; year--)
 			{
 				processor = new Processor.Processors.GameScheduleProcessor(year, associationIds);
 				processor.Run(context);
