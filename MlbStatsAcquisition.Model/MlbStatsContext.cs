@@ -47,6 +47,7 @@ namespace MlbStatsAcquisition.Model
 		public DbSet<PlayerHittingBoxscore> PlayerHittingBoxscores { get; set; }
 		public DbSet<PlayerPitchingBoxscore> PlayerPitchingBoxscores { get; set; }
 		public DbSet<PlayerFieldingBoxscore> PlayerFieldingBoxscores { get; set; }
+		public DbSet<PlayerGameBoxscore> PlayerGameBoxscores { get; set; }
 		//public DbSet<GamePlay> GamePlays { get; set; }
 
 		protected override void OnModelCreating(DbModelBuilder modelBuilder)
@@ -130,6 +131,11 @@ namespace MlbStatsAcquisition.Model
 			modelBuilder.Entity<PlayerFieldingBoxscore>().HasRequired(box => box.Game).WithMany(g => g.PlayerFieldingBoxscores).HasForeignKey(box => box.GameID).WillCascadeOnDelete(false);
 			modelBuilder.Entity<PlayerFieldingBoxscore>().HasRequired(box => box.PlayerTeamSeason).WithMany(g => g.PlayerFieldingBoxscores).HasForeignKey(box => new { box.PlayerID, box.TeamID, box.Season }).WillCascadeOnDelete(false);
 			modelBuilder.Entity<PlayerFieldingBoxscore>().HasOptional(box => box.Position).WithMany(p => p.PlayerFieldingBoxscores).HasForeignKey(box => box.PosAbbr).WillCascadeOnDelete(false);
+
+			modelBuilder.Entity<PlayerGameBoxscore>().HasKey(box => new { box.GameID, box.PlayerID });
+			modelBuilder.Entity<PlayerGameBoxscore>().HasRequired(box => box.Game).WithMany(g => g.PlayerGameBoxscores).HasForeignKey(box => box.GameID).WillCascadeOnDelete(false);
+			modelBuilder.Entity<PlayerGameBoxscore>().HasRequired(box => box.PlayerTeamSeason).WithMany(g => g.PlayerGameBoxscores).HasForeignKey(box => new { box.PlayerID, box.TeamID, box.Season }).WillCascadeOnDelete(false);
+			modelBuilder.Entity<PlayerGameBoxscore>().HasOptional(box => box.Position).WithMany(p => p.PlayerGameBoxscores).HasForeignKey(box => box.PosAbbr).WillCascadeOnDelete(false);
 
 			//modelBuilder.Entity<GamePlay>().HasKey(g => g.GamePlayID).Property(g => g.GamePlayID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
 			//modelBuilder.Entity<GamePlay>().HasRequired(g => g.Game).WithMany(g => g.Plays).HasForeignKey(g => g.GameID).WillCascadeOnDelete(false);

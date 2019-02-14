@@ -79,6 +79,12 @@ namespace MlbStatsAcquisition.Processor.Processors
 						// ASSUME FINISHED GAME WILL HAVE HITTING AND PITCHING DATA... FIELDING NOT SO MUCH
 						if (gameHasHittingBoxscores && gameHasPitchingBoxscores)
 						{
+							var dbPlayerBoxscores = context.PlayerGameBoxscores.Where(x => x.GameID == this.GameId).ToDictionary(x => x.PlayerID);
+							var awayPlayer = feed.Teams?.Away?.Players.Where(x => x.Value != null).Select(y => y.Value).ToList();
+							ProcessPlayerGameBoxscores(context, dbGame.AwayTeamID.Value, dbGame.Season, dbPlayerBoxscores, awayPlayer);
+							var homePlayers = feed.Teams?.Home?.Players.Where(x => x.Value != null).Select(y => y.Value).ToList();
+							ProcessPlayerGameBoxscores(context, dbGame.HomeTeamID.Value, dbGame.Season, dbPlayerBoxscores, homePlayers);
+
 							var dbPlayerHittingBoxscores = context.PlayerHittingBoxscores.Where(x => x.GameID == this.GameId).ToDictionary(x => x.PlayerID);
 							var awayHitters = feed.Teams?.Away?.Players.Where(x => x.Value.Stats?.Batting != null && !x.Value.Stats.Batting.IsDefault()).Select(y => y.Value).ToList();
 							ProcessHitterBoxscores(context, dbGame.AwayTeamID.Value, dbGame.Season, dbPlayerHittingBoxscores, awayHitters);
@@ -450,6 +456,65 @@ namespace MlbStatsAcquisition.Processor.Processors
 						dbBoxscore.PutOuts = (byte?)feedBox.PutOuts;
 						dbBoxscore.StolenBases = (byte?)feedBox.StolenBases;
 						dbBoxscore.PosAbbr = feedPlayer.Position?.Abbreviation;
+					}
+				}
+			}
+		}
+
+		private void ProcessPlayerGameBoxscores(MlbStatsContext context, int teamId, int season,
+			Dictionary<int, PlayerGameBoxscore> dbGameBoxscores,
+			List<Feeds.BoxscoreFeed.GamePlayer> feedPlayers)
+		{
+			foreach (var feedPlayer in feedPlayers)
+			{
+				if (feedPlayer != null)
+				{
+					bool updateStats = false;
+					if (!dbGameBoxscores.TryGetValue(feedPlayer.Person.Id, out PlayerGameBoxscore dbBoxscore))
+					{
+						updateStats = true;
+						dbBoxscore = new PlayerGameBoxscore
+						{
+							GameID = this.GameId,
+							TeamID = teamId,
+							PlayerID = feedPlayer.Person.Id,
+							Season = season
+						};
+						context.PlayerGameBoxscores.Add(dbBoxscore);
+						dbGameBoxscores.Add(feedPlayer.Person.Id, dbBoxscore);
+					}
+
+					// NOT NEW - VALUES MUST BE DIFFERENT TO UPDATE
+					// MAKE SURE NO UPDATES HAVE BEEN MADE TO STATS
+					string allPositionString = feedPlayer.AllPositions == null ? null : string.Join(";", feedPlayer.AllPositions.Select(x => x.Abbreviation));
+					bool hasHitting = feedPlayer.Stats?.Batting != null && !feedPlayer.Stats.Batting.IsDefault();
+					bool hasPitching = feedPlayer.Stats?.Pitching != null && !feedPlayer.Stats.Pitching.IsDefault();
+					bool hasFielding = feedPlayer.Stats?.Fielding != null && !feedPlayer.Stats.Fielding.IsDefault();
+
+					if (!updateStats)
+					{
+						updateStats = dbBoxscore.AllPositions != allPositionString
+										|| dbBoxscore.HasHitting != hasHitting
+										|| dbBoxscore.HasPitching != hasPitching
+										|| dbBoxscore.HasFielding != hasFielding
+										|| dbBoxscore.IsOnBench != feedPlayer?.GameStatus.IsOnBench
+										|| dbBoxscore.IsSub != feedPlayer?.GameStatus.IsSubstitute
+										|| dbBoxscore.JerseyNumber != feedPlayer.JerseyNumber
+										|| dbBoxscore.PosAbbr != feedPlayer.Position?.Abbreviation
+										|| dbBoxscore.Status != feedPlayer.Status?.Code;
+					}
+
+					if (updateStats)
+					{
+						dbBoxscore.AllPositions = allPositionString;
+						dbBoxscore.HasHitting = hasHitting;
+						dbBoxscore.HasPitching = hasPitching;
+						dbBoxscore.HasFielding = hasFielding;
+						dbBoxscore.IsOnBench = feedPlayer?.GameStatus.IsOnBench;
+						dbBoxscore.IsSub = feedPlayer?.GameStatus.IsSubstitute;
+						dbBoxscore.JerseyNumber = feedPlayer.JerseyNumber;
+						dbBoxscore.PosAbbr = feedPlayer.Position?.Abbreviation;
+						dbBoxscore.Status = feedPlayer.Status?.Code;
 					}
 				}
 			}

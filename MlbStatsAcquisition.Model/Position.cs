@@ -21,5 +21,6 @@ namespace MlbStatsAcquisition.Model
 
 		public virtual ICollection<PlayerHittingBoxscore> PlayerHittingBoxscores { get; set; }
 		public virtual ICollection<PlayerFieldingBoxscore> PlayerFieldingBoxscores { get; set; }
+		public virtual ICollection<PlayerGameBoxscore> PlayerGameBoxscores { get; set; }
 	}
 }
