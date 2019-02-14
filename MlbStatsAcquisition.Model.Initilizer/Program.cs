@@ -8,8 +8,8 @@ namespace MlbStatsAcquisition.Model.Initilizer
 {
 	class Program
 	{
-		private const int MaxYear = 2017;
-		private const int MinYear = 2016;
+		private const int MaxYear = 2013;
+		private const int MinYear = 2012;
 		static void Main(string[] args)
 		{
 			var context = GetNewContext();
@@ -67,15 +67,18 @@ namespace MlbStatsAcquisition.Model.Initilizer
 				processor.Run(context);
 				context = GetNewContext();
 
-				processors = context.Games.Where(x => x.GameTime.Year == year)
-											.ToList()
-											.Select(x => (Processor.Processors.IProcessor)new Processor.Processors.BoxscoreProcessor(x.GameID))
+				var gameDatas = context.Games.Where(x => x.GameTime.Year == year)
+											.OrderBy(x => x.GameTime)
+											.Select(x => new { x.GameID, x.GameTime, Home = x.HomeTeamSeason != null ? x.HomeTeamSeason.TeamAbbr : "", Away = x.AwayTeamSeason != null ? x.AwayTeamSeason.TeamAbbr : "" })
 											.ToList();
-				processors.ForEach(x =>
+
+				foreach (var gameData in gameDatas)
 				{
-					x.Run(context);
+					Console.WriteLine($"{gameData.GameTime.ToShortDateString()} - {gameData.GameID} - {gameData.Away?.PadRight(3, ' ')} @ {gameData.Home?.PadRight(3, ' ')}");
+					processor = new Processor.Processors.BoxscoreProcessor(gameData.GameID);
+					processor.Run(context);
 					context = GetNewContext();
-				});
+				}
 			}
 
 			context.Dispose();

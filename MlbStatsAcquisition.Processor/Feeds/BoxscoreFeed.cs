@@ -280,34 +280,46 @@ namespace MlbStatsAcquisition.Processor.Feeds
 		public class Fielding
 		{
 			[JsonProperty("assists")]
-			public int Assists { get; set; }
+			public int? Assists { get; set; }
 
 			[JsonProperty("putOuts")]
-			public int PutOuts { get; set; }
+			public int? PutOuts { get; set; }
 
 			[JsonProperty("errors")]
-			public int Errors { get; set; }
+			public int? Errors { get; set; }
 
 			[JsonProperty("chances")]
-			public int Chances { get; set; }
-
-			[JsonProperty("fielding", NullValueHandling = NullValueHandling.Ignore)]
-			public string FieldingFielding { get; set; }
+			public int? Chances { get; set; }
 
 			[JsonProperty("caughtStealing")]
-			public int CaughtStealing { get; set; }
+			public int? CaughtStealing { get; set; }
 
 			[JsonProperty("passedBall")]
-			public int PassedBall { get; set; }
+			public int? PassedBall { get; set; }
 
 			[JsonProperty("stolenBases")]
-			public int StolenBases { get; set; }
-
-			[JsonProperty("stolenBasePercentage")]
-			public string StolenBasePercentage { get; set; }
+			public int? StolenBases { get; set; }
 
 			[JsonProperty("pickoffs")]
-			public int Pickoffs { get; set; }
+			public int? Pickoffs { get; set; }
+
+			[JsonProperty("fielding", NullValueHandling = NullValueHandling.Ignore)]
+			public string FieldingPct { get; set; } // SEASON ONLY
+
+			[JsonProperty("stolenBasePercentage")]
+			public string StolenBasePercentage { get; set; } // SEASON ONLY
+
+			public bool IsDefault()
+			{
+				return (this.Assists ?? 0) == 0
+						&& (this.PutOuts ?? 0) == 0
+						&& (this.Errors ?? 0) == 0
+						&& (this.Chances ?? 0) == 0
+						&& (this.CaughtStealing ?? 0) == 0
+						&& (this.PassedBall ?? 0) == 0
+						&& (this.StolenBases ?? 0) == 0
+						&& (this.Pickoffs ?? 0) == 0;
+			}
 		}
 
 		public class Pitching

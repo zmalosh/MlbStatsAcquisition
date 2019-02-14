@@ -47,8 +47,7 @@ namespace MlbStatsAcquisition.Processor.Processors
 					}
 				}
 				feed = Feeds.BoxscoreFeed.FromJson(rawJson);
-				Console.WriteLine($"{this.GameId} - {feed.Teams.Away.Team.Abbreviation.PadRight(3, ' ')} ({feed.Teams.Away.Team.Record?.GamesPlayed}) @{feed.Teams.Home.Team.Abbreviation.PadRight(3, ' ')} ({feed.Teams.Home.Team.Record?.GamesPlayed})");
-
+				
 				if (feed != null)
 				{
 					var dbGame = context.Games.SingleOrDefault(x => x.GameID == this.GameId);
@@ -74,6 +73,9 @@ namespace MlbStatsAcquisition.Processor.Processors
 						bool gameHasPitchingBoxscores = feed.Teams.Away.Players.Any(x => x.Value.Stats?.Pitching != null && !x.Value.Stats.Pitching.IsDefault())
 													&& feed.Teams.Home.Players.Any(x => x.Value.Stats?.Pitching != null && !x.Value.Stats.Pitching.IsDefault());
 
+						bool gameHasFieldingBoxscores = feed.Teams.Away.Players.Any(x => x.Value.Stats?.Fielding != null && !x.Value.Stats.Fielding.IsDefault())
+													&& feed.Teams.Home.Players.Any(x => x.Value.Stats?.Fielding != null && !x.Value.Stats.Fielding.IsDefault());
+
 						// ASSUME FINISHED GAME WILL HAVE HITTING AND PITCHING DATA... FIELDING NOT SO MUCH
 						if (gameHasHittingBoxscores && gameHasPitchingBoxscores)
 						{
@@ -88,6 +90,15 @@ namespace MlbStatsAcquisition.Processor.Processors
 							ProcessPitcherBoxscores(context, dbGame.AwayTeamID.Value, dbGame.Season, dbPlayerPitchingBoxscores, awayPitchers);
 							var homePitchers = feed.Teams?.Home?.Players.Where(x => x.Value.Stats?.Pitching != null && !x.Value.Stats.Pitching.IsDefault()).Select(y => y.Value).ToList();
 							ProcessPitcherBoxscores(context, dbGame.HomeTeamID.Value, dbGame.Season, dbPlayerPitchingBoxscores, homePitchers);
+
+							if (gameHasFieldingBoxscores)
+							{
+								var dbPlayerFieldingBoxscores = context.PlayerFieldingBoxscores.Where(x => x.GameID == this.GameId).ToDictionary(x => x.PlayerID);
+								var awayFielders = feed.Teams?.Away?.Players.Where(x => x.Value.Stats?.Fielding != null && !x.Value.Stats.Fielding.IsDefault()).Select(y => y.Value).ToList();
+								ProcessFielderBoxscores(context, dbGame.AwayTeamID.Value, dbGame.Season, dbPlayerFieldingBoxscores, awayFielders);
+								var homeFielders = feed.Teams?.Home?.Players.Where(x => x.Value.Stats?.Fielding != null && !x.Value.Stats.Fielding.IsDefault()).Select(y => y.Value).ToList();
+								ProcessFielderBoxscores(context, dbGame.HomeTeamID.Value, dbGame.Season, dbPlayerFieldingBoxscores, homeFielders);
+							}
 						}
 					}
 
@@ -379,6 +390,60 @@ namespace MlbStatsAcquisition.Processor.Processors
 						dbBoxscore.GamePitched = (feedBox.GamesPitched == 1);
 						dbBoxscore.IsBlownSave = (feedBox.BlownSaves == 1);
 						dbBoxscore.IsCompleteGame = (feedBox.CompleteGames == 1);
+					}
+				}
+			}
+		}
+
+		private void ProcessFielderBoxscores(MlbStatsContext context, int teamId, int season,
+			Dictionary<int, PlayerFieldingBoxscore> dbGameBoxscores,
+			List<Feeds.BoxscoreFeed.GamePlayer> feedPlayers)
+		{
+			foreach (var feedPlayer in feedPlayers)
+			{
+				if (feedPlayer?.Stats?.Fielding != null)
+				{
+					bool updateStats = false;
+					if (!dbGameBoxscores.TryGetValue(feedPlayer.Person.Id, out PlayerFieldingBoxscore dbBoxscore))
+					{
+						updateStats = true;
+						dbBoxscore = new PlayerFieldingBoxscore
+						{
+							GameID = this.GameId,
+							TeamID = teamId,
+							PlayerID = feedPlayer.Person.Id,
+							Season = season
+						};
+						context.PlayerFieldingBoxscores.Add(dbBoxscore);
+						dbGameBoxscores.Add(feedPlayer.Person.Id, dbBoxscore);
+					}
+
+					var feedBox = feedPlayer.Stats.Fielding;
+
+					// NOT NEW - STATS MUST BE DIFFERENT TO UPDATE
+					// MAKE SURE NO UPDATES HAVE BEEN MADE TO STATS
+					if (!updateStats)
+					{
+						updateStats = feedBox.Assists != dbBoxscore.Assists
+										|| feedBox.CaughtStealing != dbBoxscore.CaughtStealing
+										|| feedBox.Chances != dbBoxscore.Chances
+										|| feedBox.Errors != dbBoxscore.Errors
+										|| feedBox.PassedBall != dbBoxscore.PassedBall
+										|| feedBox.Pickoffs != dbBoxscore.Pickoffs
+										|| feedBox.PutOuts != dbBoxscore.PutOuts
+										|| feedBox.StolenBases != dbBoxscore.StolenBases;
+					}
+
+					if (updateStats)
+					{
+						dbBoxscore.Assists = (byte?)feedBox.Assists;
+						dbBoxscore.CaughtStealing = (byte?)feedBox.CaughtStealing;
+						dbBoxscore.Chances = (byte?)feedBox.Chances;
+						dbBoxscore.Errors = (byte?)feedBox.Errors;
+						dbBoxscore.PassedBall = (byte?)feedBox.PassedBall;
+						dbBoxscore.Pickoffs = (byte?)feedBox.Pickoffs;
+						dbBoxscore.PutOuts = (byte?)feedBox.PutOuts;
+						dbBoxscore.StolenBases = (byte?)feedBox.StolenBases;
 					}
 				}
 			}

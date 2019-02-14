@@ -46,6 +46,7 @@ namespace MlbStatsAcquisition.Model
 		public DbSet<UmpireAssignment> UmpireAssignments { get; set; }
 		public DbSet<PlayerHittingBoxscore> PlayerHittingBoxscores { get; set; }
 		public DbSet<PlayerPitchingBoxscore> PlayerPitchingBoxscores { get; set; }
+		public DbSet<PlayerFieldingBoxscore> PlayerFieldingBoxscores { get; set; }
 		//public DbSet<GamePlay> GamePlays { get; set; }
 
 		protected override void OnModelCreating(DbModelBuilder modelBuilder)
@@ -123,6 +124,10 @@ namespace MlbStatsAcquisition.Model
 			modelBuilder.Entity<PlayerPitchingBoxscore>().HasKey(box => new { box.GameID, box.PlayerID });
 			modelBuilder.Entity<PlayerPitchingBoxscore>().HasRequired(box => box.Game).WithMany(g => g.PlayerPitchingBoxscores).HasForeignKey(box => box.GameID).WillCascadeOnDelete(false);
 			modelBuilder.Entity<PlayerPitchingBoxscore>().HasRequired(box => box.PlayerTeamSeason).WithMany(g => g.PlayerPitchingBoxscores).HasForeignKey(box => new { box.PlayerID, box.TeamID, box.Season }).WillCascadeOnDelete(false);
+
+			modelBuilder.Entity<PlayerFieldingBoxscore>().HasKey(box => new { box.GameID, box.PlayerID });
+			modelBuilder.Entity<PlayerFieldingBoxscore>().HasRequired(box => box.Game).WithMany(g => g.PlayerFieldingBoxscores).HasForeignKey(box => box.GameID).WillCascadeOnDelete(false);
+			modelBuilder.Entity<PlayerFieldingBoxscore>().HasRequired(box => box.PlayerTeamSeason).WithMany(g => g.PlayerFieldingBoxscores).HasForeignKey(box => new { box.PlayerID, box.TeamID, box.Season }).WillCascadeOnDelete(false);
 
 			//modelBuilder.Entity<GamePlay>().HasKey(g => g.GamePlayID).Property(g => g.GamePlayID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
 			//modelBuilder.Entity<GamePlay>().HasRequired(g => g.Game).WithMany(g => g.Plays).HasForeignKey(g => g.GameID).WillCascadeOnDelete(false);

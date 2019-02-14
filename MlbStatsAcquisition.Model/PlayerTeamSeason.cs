@@ -16,5 +16,6 @@ namespace MlbStatsAcquisition.Model
 		public virtual TeamSeason TeamSeason { get; set; }
 		public virtual ICollection<PlayerHittingBoxscore> PlayerHittingBoxscores { get; set; }
 		public virtual ICollection<PlayerPitchingBoxscore> PlayerPitchingBoxscores { get; set; }
+		public virtual ICollection<PlayerFieldingBoxscore> PlayerFieldingBoxscores { get; set; }
 	}
 }

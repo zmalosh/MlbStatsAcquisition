@@ -56,5 +56,6 @@ namespace MlbStatsAcquisition.Model
 		//public virtual ICollection<GamePlay> Plays { get; set; }
 		public virtual ICollection<PlayerHittingBoxscore> PlayerHittingBoxscores { get; set; }
 		public virtual ICollection<PlayerPitchingBoxscore> PlayerPitchingBoxscores { get; set; }
+		public virtual ICollection<PlayerFieldingBoxscore> PlayerFieldingBoxscores { get; set; }
 	}
 }

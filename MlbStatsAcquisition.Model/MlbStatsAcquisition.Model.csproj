@@ -66,6 +66,7 @@
     <Compile Include="PitchResultType.cs" />
     <Compile Include="PitchType.cs" />
     <Compile Include="Player.cs" />
+    <Compile Include="PlayerFieldingBoxscore.cs" />
     <Compile Include="PlayerHittingBoxscore.cs" />
     <Compile Include="PlayerPitchingBoxscore.cs" />
     <Compile Include="PlayerTeamSeason.cs" />
