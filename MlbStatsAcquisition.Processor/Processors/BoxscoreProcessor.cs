@@ -47,7 +47,7 @@ namespace MlbStatsAcquisition.Processor.Processors
 					}
 				}
 				feed = Feeds.BoxscoreFeed.FromJson(rawJson);
-				
+
 				if (feed != null)
 				{
 					var dbGame = context.Games.SingleOrDefault(x => x.GameID == this.GameId);
@@ -241,7 +241,8 @@ namespace MlbStatsAcquisition.Processor.Processors
 										|| feedBox.IntentionalWalks != dbBoxscore.IntentionalWalks
 										|| feedBox.CatchersInterference != dbBoxscore.CatcherInterferences
 										|| feedBox.GroundIntoDoublePlay != dbBoxscore.GroundIntoDoublePlay
-										|| feedBox.GroundIntoTriplePlay != dbBoxscore.GroundIntoTriplePlay;
+										|| feedBox.GroundIntoTriplePlay != dbBoxscore.GroundIntoTriplePlay
+										|| feedPlayer.BattingOrder != dbBoxscore.BattingOrder;
 					}
 
 					if (updateStats)
@@ -270,6 +271,7 @@ namespace MlbStatsAcquisition.Processor.Processors
 						dbBoxscore.CatcherInterferences = (byte?)feedBox.CatchersInterference;
 						dbBoxscore.GroundIntoDoublePlay = (byte?)feedBox.GroundIntoDoublePlay;
 						dbBoxscore.GroundIntoTriplePlay = (byte?)feedBox.GroundIntoTriplePlay;
+						dbBoxscore.BattingOrder = feedPlayer.BattingOrder;
 					}
 				}
 			}

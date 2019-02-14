@@ -13,6 +13,7 @@ namespace MlbStatsAcquisition.Model
 		public int TeamID { get; set; }
 		public int Season { get; set; }
 		public bool GamePlayed { get; set; }
+		public int? BattingOrder { get; set; }
 		public byte? AtBats { get; set; }
 		public byte? Hits { get; set; }
 		public byte? Runs { get; set; }

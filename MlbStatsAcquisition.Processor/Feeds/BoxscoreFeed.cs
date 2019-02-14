@@ -556,7 +556,7 @@ namespace MlbStatsAcquisition.Processor.Feeds
 			public int ParentTeamId { get; set; }
 
 			[JsonProperty("battingOrder")]
-			public int BattingOrder { get; set; }
+			public int? BattingOrder { get; set; }
 
 			[JsonProperty("seasonStats")]
 			public SeasonStats SeasonStats { get; set; }
