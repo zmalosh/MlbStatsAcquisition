@@ -262,7 +262,7 @@ namespace MlbStatsAcquisition.Processor.Processors
 						dbBoxscore.FlyOuts = (byte?)feedBox.FlyOuts;
 						dbBoxscore.RunnersLeftOnBase = (byte?)feedBox.LeftOnBase;
 						dbBoxscore.HitByPitches = (byte?)feedBox.HitByPitch;
-						dbBoxscore.GamePlayed = ((feedBox.GamesPlayed ?? 0) == 1);
+						dbBoxscore.GamePlayed = ((feedBox.GamesPlayed ?? 0) == 1) || feedBox.AtBats > 0 || feedPlayer.BattingOrder != null;
 						dbBoxscore.CaughtStealing = (byte?)feedBox.CaughtStealing;
 						dbBoxscore.Pickoffs = (byte?)feedBox.Pickoffs;
 						dbBoxscore.StolenBases = (byte?)feedBox.StolenBases;
