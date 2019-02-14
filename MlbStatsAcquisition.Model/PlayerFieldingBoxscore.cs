@@ -12,6 +12,7 @@ namespace MlbStatsAcquisition.Model
 		public int PlayerID { get; set; }
 		public int TeamID { get; set; }
 		public int Season { get; set; }
+		public string PosAbbr { get; set; }
 		public byte? Assists { get; set; }
 		public byte? PutOuts { get; set; }
 		public byte? Errors { get; set; }
@@ -23,5 +24,6 @@ namespace MlbStatsAcquisition.Model
 
 		public virtual Game Game { get; set; }
 		public virtual PlayerTeamSeason PlayerTeamSeason { get; set; }
+		public virtual Position Position { get; set; }
 	}
 }

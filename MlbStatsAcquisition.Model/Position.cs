@@ -18,5 +18,8 @@ namespace MlbStatsAcquisition.Model
 		public bool IsFielder { get; set; }
 		public bool IsOutfield { get; set; }
 		public string Code { get; set; }
+
+		public virtual ICollection<PlayerHittingBoxscore> PlayerHittingBoxscores { get; set; }
+		public virtual ICollection<PlayerFieldingBoxscore> PlayerFieldingBoxscores { get; set; }
 	}
 }

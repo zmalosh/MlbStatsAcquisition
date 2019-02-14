@@ -14,6 +14,7 @@ namespace MlbStatsAcquisition.Model
 		public int Season { get; set; }
 		public bool GamePlayed { get; set; }
 		public int? BattingOrder { get; set; }
+		public string PosAbbr { get; set; }
 		public byte? AtBats { get; set; }
 		public byte? Hits { get; set; }
 		public byte? Runs { get; set; }
@@ -40,5 +41,6 @@ namespace MlbStatsAcquisition.Model
 
 		public virtual Game Game { get; set; }
 		public virtual PlayerTeamSeason PlayerTeamSeason { get; set; }
+		public virtual Position Position { get; set; }
 	}
 }

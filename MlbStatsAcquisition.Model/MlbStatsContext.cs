@@ -120,6 +120,7 @@ namespace MlbStatsAcquisition.Model
 			modelBuilder.Entity<PlayerHittingBoxscore>().HasKey(box => new { box.GameID, box.PlayerID });
 			modelBuilder.Entity<PlayerHittingBoxscore>().HasRequired(box => box.Game).WithMany(g => g.PlayerHittingBoxscores).HasForeignKey(box => box.GameID).WillCascadeOnDelete(false);
 			modelBuilder.Entity<PlayerHittingBoxscore>().HasRequired(box => box.PlayerTeamSeason).WithMany(g => g.PlayerHittingBoxscores).HasForeignKey(box => new { box.PlayerID, box.TeamID, box.Season }).WillCascadeOnDelete(false);
+			modelBuilder.Entity<PlayerHittingBoxscore>().HasOptional(box => box.Position).WithMany(p => p.PlayerHittingBoxscores).HasForeignKey(box => box.PosAbbr).WillCascadeOnDelete(false);
 
 			modelBuilder.Entity<PlayerPitchingBoxscore>().HasKey(box => new { box.GameID, box.PlayerID });
 			modelBuilder.Entity<PlayerPitchingBoxscore>().HasRequired(box => box.Game).WithMany(g => g.PlayerPitchingBoxscores).HasForeignKey(box => box.GameID).WillCascadeOnDelete(false);
@@ -128,6 +129,7 @@ namespace MlbStatsAcquisition.Model
 			modelBuilder.Entity<PlayerFieldingBoxscore>().HasKey(box => new { box.GameID, box.PlayerID });
 			modelBuilder.Entity<PlayerFieldingBoxscore>().HasRequired(box => box.Game).WithMany(g => g.PlayerFieldingBoxscores).HasForeignKey(box => box.GameID).WillCascadeOnDelete(false);
 			modelBuilder.Entity<PlayerFieldingBoxscore>().HasRequired(box => box.PlayerTeamSeason).WithMany(g => g.PlayerFieldingBoxscores).HasForeignKey(box => new { box.PlayerID, box.TeamID, box.Season }).WillCascadeOnDelete(false);
+			modelBuilder.Entity<PlayerFieldingBoxscore>().HasOptional(box => box.Position).WithMany(p => p.PlayerFieldingBoxscores).HasForeignKey(box => box.PosAbbr).WillCascadeOnDelete(false);
 
 			//modelBuilder.Entity<GamePlay>().HasKey(g => g.GamePlayID).Property(g => g.GamePlayID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
 			//modelBuilder.Entity<GamePlay>().HasRequired(g => g.Game).WithMany(g => g.Plays).HasForeignKey(g => g.GameID).WillCascadeOnDelete(false);

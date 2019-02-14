@@ -242,7 +242,8 @@ namespace MlbStatsAcquisition.Processor.Processors
 										|| feedBox.CatchersInterference != dbBoxscore.CatcherInterferences
 										|| feedBox.GroundIntoDoublePlay != dbBoxscore.GroundIntoDoublePlay
 										|| feedBox.GroundIntoTriplePlay != dbBoxscore.GroundIntoTriplePlay
-										|| feedPlayer.BattingOrder != dbBoxscore.BattingOrder;
+										|| feedPlayer.BattingOrder != dbBoxscore.BattingOrder
+										|| feedPlayer.Position?.Abbreviation != dbBoxscore.PosAbbr;
 					}
 
 					if (updateStats)
@@ -272,6 +273,7 @@ namespace MlbStatsAcquisition.Processor.Processors
 						dbBoxscore.GroundIntoDoublePlay = (byte?)feedBox.GroundIntoDoublePlay;
 						dbBoxscore.GroundIntoTriplePlay = (byte?)feedBox.GroundIntoTriplePlay;
 						dbBoxscore.BattingOrder = feedPlayer.BattingOrder;
+						dbBoxscore.PosAbbr = feedPlayer.Position?.Abbreviation;
 					}
 				}
 			}
@@ -433,7 +435,8 @@ namespace MlbStatsAcquisition.Processor.Processors
 										|| feedBox.PassedBall != dbBoxscore.PassedBall
 										|| feedBox.Pickoffs != dbBoxscore.Pickoffs
 										|| feedBox.PutOuts != dbBoxscore.PutOuts
-										|| feedBox.StolenBases != dbBoxscore.StolenBases;
+										|| feedBox.StolenBases != dbBoxscore.StolenBases
+										|| feedPlayer.Position?.Abbreviation != dbBoxscore.PosAbbr;
 					}
 
 					if (updateStats)
@@ -446,6 +449,7 @@ namespace MlbStatsAcquisition.Processor.Processors
 						dbBoxscore.Pickoffs = (byte?)feedBox.Pickoffs;
 						dbBoxscore.PutOuts = (byte?)feedBox.PutOuts;
 						dbBoxscore.StolenBases = (byte?)feedBox.StolenBases;
+						dbBoxscore.PosAbbr = feedPlayer.Position?.Abbreviation;
 					}
 				}
 			}
