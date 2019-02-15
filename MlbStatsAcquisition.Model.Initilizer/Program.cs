@@ -8,8 +8,8 @@ namespace MlbStatsAcquisition.Model.Initilizer
 {
 	class Program
 	{
-		private const int MaxYear = 2013;
-		private const int MinYear = 2012;
+		private const int MaxYear = 2018;
+		private const int MinYear = 2010;
 		static void Main(string[] args)
 		{
 			var context = GetNewContext();
