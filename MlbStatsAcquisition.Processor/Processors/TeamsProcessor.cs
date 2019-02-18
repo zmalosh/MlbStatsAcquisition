@@ -23,13 +23,9 @@ namespace MlbStatsAcquisition.Processor.Processors
 		{
 			Console.WriteLine($"TeamsProcessor - {this.Season}");
 
-			Feeds.TeamsFeed feed;
-			using (var client = new WebClient())
-			{
-				var url = Feeds.TeamsFeed.GetFeedUrl(this.Season);
-				var rawJson = client.DownloadString(url);
-				feed = Feeds.TeamsFeed.FromJson(rawJson);
-			}
+			var url = Feeds.TeamsFeed.GetFeedUrl(this.Season);
+			var rawJson = JsonUtility.GetRawJsonFromUrl(url);
+			var feed = Feeds.TeamsFeed.FromJson(rawJson);
 
 			var dbAssociations = context.Associations.ToDictionary(x => x.AssociationID);
 			var dbLeagues = context.Leagues.ToDictionary(x => x.LeagueID);

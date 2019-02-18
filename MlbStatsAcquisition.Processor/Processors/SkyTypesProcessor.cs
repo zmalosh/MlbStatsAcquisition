@@ -11,13 +11,9 @@ namespace MlbStatsAcquisition.Processor.Processors
 	{
 		public void Run(Model.MlbStatsContext context)
 		{
-			List<Feeds.SkyTypesFeed> feed;
-			using (var client = new WebClient())
-			{
-				var url = Feeds.SkyTypesFeed.GetFeedUrl();
-				var rawJson = client.DownloadString(url);
-				feed = Feeds.SkyTypesFeed.FromJson(rawJson);
-			}
+			var url = Feeds.SkyTypesFeed.GetFeedUrl();
+			var rawJson = JsonUtility.GetRawJsonFromUrl(url);
+			var feed = Feeds.SkyTypesFeed.FromJson(rawJson);
 
 			var dbSkyTypes = context.SkyTypes.ToDictionary(x => x.Code);
 			foreach (var feedSkyType in feed)

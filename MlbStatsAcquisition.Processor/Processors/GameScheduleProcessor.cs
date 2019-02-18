@@ -44,13 +44,9 @@ namespace MlbStatsAcquisition.Processor.Processors
 
 				var dbGames = context.Games.Where(x => x.GameTime.Year == this.Year && x.AssociationID == associationId).ToDictionary(x => x.GameID);
 
-				Feeds.GameScheduleFeed feed;
-				using (var client = new WebClient())
-				{
-					var url = Feeds.GameScheduleFeed.GetFeedUrl(this.Year, associationId);
-					var rawJson = client.DownloadString(url);
-					feed = Feeds.GameScheduleFeed.FromJson(rawJson);
-				}
+				var url = Feeds.GameScheduleFeed.GetFeedUrl(this.Year, associationId);
+				var rawJson = JsonUtility.GetRawJsonFromUrl(url);
+				var feed = Feeds.GameScheduleFeed.FromJson(rawJson);
 
 				if (feed?.Dates != null && feed.Dates.Count > 0)
 				{

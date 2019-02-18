@@ -11,13 +11,9 @@ namespace MlbStatsAcquisition.Processor.Processors
 	{
 		public void Run(Model.MlbStatsContext context)
 		{
-			List<Feeds.ReviewReasonTypesFeed> feed;
-			using (var client = new WebClient())
-			{
-				var url = Feeds.ReviewReasonTypesFeed.GetFeedUrl();
-				var rawJson = client.DownloadString(url);
-				feed = Feeds.ReviewReasonTypesFeed.FromJson(rawJson);
-			}
+			var url = Feeds.ReviewReasonTypesFeed.GetFeedUrl();
+			var rawJson = JsonUtility.GetRawJsonFromUrl(url);
+			var feed = Feeds.ReviewReasonTypesFeed.FromJson(rawJson);
 
 			var dbReviewReasonTypes = context.ReviewReasonTypes.ToDictionary(x => x.Code);
 			foreach (var feedReviewReasonType in feed)

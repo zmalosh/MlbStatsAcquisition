@@ -11,13 +11,9 @@ namespace MlbStatsAcquisition.Processor.Processors
 	{
 		public void Run(Model.MlbStatsContext context)
 		{
-			List<Feeds.WindTypesFeed> feed;
-			using (var client = new WebClient())
-			{
-				var url = Feeds.WindTypesFeed.GetFeedUrl();
-				var rawJson = client.DownloadString(url);
-				feed = Feeds.WindTypesFeed.FromJson(rawJson);
-			}
+			var url = Feeds.WindTypesFeed.GetFeedUrl();
+			var rawJson = JsonUtility.GetRawJsonFromUrl(url);
+			var feed = Feeds.WindTypesFeed.FromJson(rawJson);
 
 			var dbWindTypes = context.WindTypes.ToDictionary(x => x.Code);
 			foreach (var feedWindType in feed)

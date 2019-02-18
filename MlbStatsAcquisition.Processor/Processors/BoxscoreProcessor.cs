@@ -26,13 +26,13 @@ namespace MlbStatsAcquisition.Processor.Processors
 				string rawJson = null;
 				try
 				{
-					rawJson = client.DownloadString(url);
+					rawJson = JsonUtility.GetRawJsonFromUrl(url);
 				}
 				catch (WebException ex)
 				{
 					try
 					{
-						rawJson = client.DownloadString(url);
+						rawJson = JsonUtility.GetRawJsonFromUrl(url);
 					}
 					catch (Exception ex2)
 					{

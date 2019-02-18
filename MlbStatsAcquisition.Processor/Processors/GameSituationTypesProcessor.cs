@@ -11,13 +11,10 @@ namespace MlbStatsAcquisition.Processor.Processors
 	{
 		public void Run(Model.MlbStatsContext context)
 		{
-			List<Feeds.GameSituationTypesFeed> feed;
-			using (var client = new WebClient())
-			{
-				var url = Feeds.GameSituationTypesFeed.GetFeedUrl();
-				var rawJson = client.DownloadString(url);
-				feed = Feeds.GameSituationTypesFeed.FromJson(rawJson);
-			}
+			var url = Feeds.GameSituationTypesFeed.GetFeedUrl();
+			var rawJson = JsonUtility.GetRawJsonFromUrl(url);
+			var feed = Feeds.GameSituationTypesFeed.FromJson(rawJson);
+
 
 			var dbGameSituationTypes = context.GameSituationTypes.ToDictionary(x => x.Code);
 			foreach (var feedGameSituationType in feed)

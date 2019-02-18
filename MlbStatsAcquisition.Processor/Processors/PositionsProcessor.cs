@@ -11,13 +11,9 @@ namespace MlbStatsAcquisition.Processor.Processors
 	{
 		public void Run(Model.MlbStatsContext context)
 		{
-			List<Feeds.PositionsFeed> feed;
-			using (var client = new WebClient())
-			{
-				var url = Feeds.PositionsFeed.GetFeedUrl();
-				var rawJson = client.DownloadString(url);
-				feed = Feeds.PositionsFeed.FromJson(rawJson);
-			}
+			var url = Feeds.PositionsFeed.GetFeedUrl();
+			var rawJson = JsonUtility.GetRawJsonFromUrl(url);
+			var feed = Feeds.PositionsFeed.FromJson(rawJson);
 
 			var dbPositions = context.Positions.ToDictionary(x => x.PositionAbbr);
 			foreach (var feedPosition in feed)

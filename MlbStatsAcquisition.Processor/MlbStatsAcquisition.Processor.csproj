@@ -75,6 +75,7 @@
     <Compile Include="Feeds\TeamsFeed.cs" />
     <Compile Include="Feeds\VenuesFeed.cs" />
     <Compile Include="Feeds\WindTypesFeed.cs" />
+    <Compile Include="JsonUtility.cs" />
     <Compile Include="Processors\AssociationsProcessor.cs" />
     <Compile Include="Processors\BoxscoreProcessor.cs" />
     <Compile Include="Processors\GameScheduleProcessor.cs" />

@@ -11,13 +11,9 @@ namespace MlbStatsAcquisition.Processor.Processors
 	{
 		public void Run(Model.MlbStatsContext context)
 		{
-			Feeds.VenuesFeed feed;
-			using (var client = new WebClient())
-			{
-				var url = Feeds.VenuesFeed.GetFeedUrl();
-				var rawJson = client.DownloadString(url);
-				feed = Feeds.VenuesFeed.FromJson(rawJson);
-			}
+			var url = Feeds.VenuesFeed.GetFeedUrl();
+			var rawJson = JsonUtility.GetRawJsonFromUrl(url);
+			var feed = Feeds.VenuesFeed.FromJson(rawJson);
 
 			var dbVenues = context.Venues.ToDictionary(x => x.VenueID);
 			foreach (var feedVenue in feed.Venues)

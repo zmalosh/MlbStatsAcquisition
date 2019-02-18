@@ -11,13 +11,9 @@ namespace MlbStatsAcquisition.Processor.Processors
 	{
 		public void Run(Model.MlbStatsContext context)
 		{
-			List<Feeds.StandingsTypesFeed> feed;
-			using (var client = new WebClient())
-			{
-				var url = Feeds.StandingsTypesFeed.GetFeedUrl();
-				var rawJson = client.DownloadString(url);
-				feed = Feeds.StandingsTypesFeed.FromJson(rawJson);
-			}
+			var url = Feeds.StandingsTypesFeed.GetFeedUrl();
+			var rawJson = JsonUtility.GetRawJsonFromUrl(url);
+			var feed = Feeds.StandingsTypesFeed.FromJson(rawJson);
 
 			var dbStandingsTypes = context.StandingsTypes.ToDictionary(x => x.StandingsTypeName);
 			foreach (var feedStandingsType in feed)

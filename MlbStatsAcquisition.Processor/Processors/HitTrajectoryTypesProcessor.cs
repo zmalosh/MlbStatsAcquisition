@@ -11,13 +11,9 @@ namespace MlbStatsAcquisition.Processor.Processors
 	{
 		public void Run(Model.MlbStatsContext context)
 		{
-			List<Feeds.HitTrajectoriesFeed> feed;
-			using (var client = new WebClient())
-			{
-				var url = Feeds.HitTrajectoriesFeed.GetFeedUrl();
-				var rawJson = client.DownloadString(url);
-				feed = Feeds.HitTrajectoriesFeed.FromJson(rawJson);
-			}
+			var url = Feeds.HitTrajectoriesFeed.GetFeedUrl();
+			var rawJson = JsonUtility.GetRawJsonFromUrl(url);
+			var feed = Feeds.HitTrajectoriesFeed.FromJson(rawJson);
 
 			var dbHitTrajectoryTypes = context.HitTrajectoryTypes.ToDictionary(x => x.Code);
 			foreach (var feedHitTrajectoryType in feed)

@@ -19,13 +19,9 @@ namespace MlbStatsAcquisition.Processor.Processors
 
 		public void Run(Model.MlbStatsContext context)
 		{
-			Feeds.AssociationsFeed feed;
-			using (var client = new WebClient())
-			{
-				var url = Feeds.AssociationsFeed.GetFeedUrl();
-				var rawJson = client.DownloadString(url);
-				feed = Feeds.AssociationsFeed.FromJson(rawJson);
-			}
+			var url = Feeds.AssociationsFeed.GetFeedUrl();
+			var rawJson = JsonUtility.GetRawJsonFromUrl(url);
+			var feed = Feeds.AssociationsFeed.FromJson(rawJson);
 
 			var dbAssociations = context.Associations.ToDictionary(x => x.AssociationID);
 			foreach (var feedAssociation in feed.Associations)

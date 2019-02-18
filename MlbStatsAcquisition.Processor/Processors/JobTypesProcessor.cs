@@ -11,14 +11,10 @@ namespace MlbStatsAcquisition.Processor.Processors
 	{
 		public void Run(Model.MlbStatsContext context)
 		{
-			List<Feeds.JobTypesFeed> feed;
-			using (var client = new WebClient())
-			{
-				var url = Feeds.JobTypesFeed.GetFeedUrl();
-				var rawJson = client.DownloadString(url);
-				feed = Feeds.JobTypesFeed.FromJson(rawJson);
-				feed = feed.OrderBy(x => x.SortOrder.HasValue ? 1 : 2).ThenBy(y => y.SortOrder).ThenBy(z => z.Code).ToList();
-			}
+			var url = Feeds.JobTypesFeed.GetFeedUrl();
+			var rawJson = JsonUtility.GetRawJsonFromUrl(url);
+			var feed = Feeds.JobTypesFeed.FromJson(rawJson);
+			feed = feed.OrderBy(x => x.SortOrder.HasValue ? 1 : 2).ThenBy(y => y.SortOrder).ThenBy(z => z.Code).ToList();
 
 			var dbJobTypes = context.JobTypes.ToDictionary(x => x.Code);
 			foreach (var feedJobType in feed)
