@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MlbStatsAcquisition.Model
 {
-	public class LeagueSeason
+	public class LeagueSeason : MlbStatsEntity
 	{
 		public int LeagueID { get; set; }
 		public int Season { get; set; }

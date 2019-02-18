@@ -17,7 +17,7 @@ namespace MlbStatsAcquisition.Model
 		RightField = 6
 	}
 
-	public class RefUmpireType
+	public class RefUmpireType : MlbStatsEntity
 	{
 		public UmpireType UmpireType { get; set; }
 		public string Name { get; set; }
