@@ -21,41 +21,41 @@ namespace MlbStatsAcquisition.Model.Initilizer
 			{
 				var init = new MlbStatsContextInitilizer();
 				init.InitializeDatabase(context);
+			}
 
-				processors = new List<Processor.Processors.IProcessor>
-					{
-						new Processor.Processors.AssociationsProcessor(),
-						new Processor.Processors.VenuesProcessor(),
-						new Processor.Processors.StatTypesProcessor(),
-						new Processor.Processors.PositionsProcessor(),
-						new Processor.Processors.GameEventTypesProcessor(),
-						new Processor.Processors.GameStatusTypesProcessor(),
-						new Processor.Processors.GameTypesProcessor(),
-						new Processor.Processors.HitTrajectoryTypesProcessor(),
-						new Processor.Processors.JobTypesProcessor(),
-						new Processor.Processors.PitchResultTypesProcessor(),
-						new Processor.Processors.PitchTypesProcessor(),
-						new Processor.Processors.ReviewReasonTypesProcessor(),
-						new Processor.Processors.GameSituationTypesProcessor(),
-						new Processor.Processors.SkyTypesProcessor(),
-						new Processor.Processors.WindTypesProcessor(),
-						new Processor.Processors.StandingsTypesProcessor()
-					};
+			processors = new List<Processor.Processors.IProcessor>
+			{
+				new Processor.Processors.AssociationsProcessor(),
+				new Processor.Processors.VenuesProcessor(),
+				new Processor.Processors.StatTypesProcessor(),
+				new Processor.Processors.PositionsProcessor(),
+				new Processor.Processors.GameEventTypesProcessor(),
+				new Processor.Processors.GameStatusTypesProcessor(),
+				new Processor.Processors.GameTypesProcessor(),
+				new Processor.Processors.HitTrajectoryTypesProcessor(),
+				new Processor.Processors.JobTypesProcessor(),
+				new Processor.Processors.PitchResultTypesProcessor(),
+				new Processor.Processors.PitchTypesProcessor(),
+				new Processor.Processors.ReviewReasonTypesProcessor(),
+				new Processor.Processors.GameSituationTypesProcessor(),
+				new Processor.Processors.SkyTypesProcessor(),
+				new Processor.Processors.WindTypesProcessor(),
+				new Processor.Processors.StandingsTypesProcessor()
+			};
 
-				foreach (var p in processors)
-				{
-					p.Run(context);
-				}
+			foreach (var p in processors)
+			{
+				p.Run(context);
+			}
 
-				processors = new List<Processor.Processors.IProcessor>();
-				for (int i = MaxYear; i >= MinYear; i--)
-				{
-					processors.Add(new Processor.Processors.TeamsProcessor(i));
-				}
-				foreach (var p in processors)
-				{
-					p.Run(context);
-				}
+			processors = new List<Processor.Processors.IProcessor>();
+			for (int i = MaxYear; i >= MinYear; i--)
+			{
+				processors.Add(new Processor.Processors.TeamsProcessor(i));
+			}
+			foreach (var p in processors)
+			{
+				p.Run(context);
 			}
 
 			var associationIds = context.Associations.Where(x => x.IsEnabled).Select(x => x.AssociationID).ToList();

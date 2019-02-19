@@ -23,29 +23,8 @@ namespace MlbStatsAcquisition.Processor.Processors
 			using (var client = new WebClient())
 			{
 				var url = Feeds.BoxscoreFeed.GetFeedUrl(this.GameId);
-				string rawJson = null;
-				try
-				{
-					rawJson = JsonUtility.GetRawJsonFromUrl(url);
-				}
-				catch (WebException ex)
-				{
-					try
-					{
-						rawJson = JsonUtility.GetRawJsonFromUrl(url);
-					}
-					catch (Exception ex2)
-					{
-						string dir = "FailedGameIDs";
-						if (!System.IO.Directory.Exists(dir))
-						{
-							System.IO.Directory.CreateDirectory(dir);
-						}
-						var filePath = string.Format($"{dir}\\{this.GameId}.nobueno");
-						System.IO.File.Create(filePath);
-						return;
-					}
-				}
+				string rawJson = JsonUtility.GetRawJsonFromUrl(url); ;
+				if(rawJson == null) { return; }
 				feed = Feeds.BoxscoreFeed.FromJson(rawJson);
 
 				if (feed != null)
