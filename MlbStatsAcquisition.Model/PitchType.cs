@@ -8,7 +8,7 @@ namespace MlbStatsAcquisition.Model
 {
 	public class PitchType : MlbStatsEntity
 	{
-		public int PitchTypeID { get; set; }
+		public byte PitchTypeID { get; set; }
 		public string Code { get; set; }
 		public string Description { get; set; }
 	}

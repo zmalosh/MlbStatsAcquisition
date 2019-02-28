@@ -27,7 +27,7 @@ namespace MlbStatsAcquisition.Processor.Processors
 						FullName = feedPosition.FullName,
 						FormalName = feedPosition.FormalName,
 						DisplayName = feedPosition.DisplayName,
-						Code = feedPosition.Code,
+						PositionCode = feedPosition.Code,
 						IsFielder = feedPosition.Fielder,
 						IsPitcher = feedPosition.Pitcher,
 						IsOutfield = feedPosition.Outfield,

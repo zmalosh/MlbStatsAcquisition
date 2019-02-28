@@ -9,6 +9,7 @@ namespace MlbStatsAcquisition.Model
 	public class Position : MlbStatsEntity
 	{
 		public string PositionAbbr { get; set; }
+		public string PositionCode { get; set; }
 		public string ShortName { get; set; }
 		public string PositionType { get; set; }
 		public string DisplayName { get; set; }
@@ -17,7 +18,6 @@ namespace MlbStatsAcquisition.Model
 		public bool IsPitcher { get; set; }
 		public bool IsFielder { get; set; }
 		public bool IsOutfield { get; set; }
-		public string Code { get; set; }
 
 		public virtual ICollection<PlayerHittingBoxscore> PlayerHittingBoxscores { get; set; }
 		public virtual ICollection<PlayerFieldingBoxscore> PlayerFieldingBoxscores { get; set; }

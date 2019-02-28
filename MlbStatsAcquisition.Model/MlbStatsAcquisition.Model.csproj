@@ -54,6 +54,10 @@
     <Compile Include="DivisionSeason.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="GamePlay.cs" />
+    <Compile Include="GamePlayAction.cs" />
+    <Compile Include="GamePlayPickoff.cs" />
+    <Compile Include="GamePlayPitch.cs" />
+    <Compile Include="GamePlayRunner.cs" />
     <Compile Include="League.cs" />
     <Compile Include="GameEventType.cs" />
     <Compile Include="GameStatusType.cs" />
@@ -75,6 +79,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReviewReasonType.cs" />
     <Compile Include="GameSituationType.cs" />
+    <Compile Include="RunnerLocation.cs" />
     <Compile Include="SkyType.cs" />
     <Compile Include="StandingsType.cs" />
     <Compile Include="StatType.cs" />

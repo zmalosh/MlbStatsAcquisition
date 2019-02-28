@@ -6,10 +6,13 @@ using System.Threading.Tasks;
 
 namespace MlbStatsAcquisition.Model
 {
-	public class GameEventType : MlbStatsEntity
+	[Flags]
+	public enum RunnerLocation
 	{
-		public byte GameEventTypeID { get; set; }
-		public string Code { get; set; }
-		public string Description { get; set; }
+		Home_Start = 0,
+		First = 1,
+		Second = 2,
+		Third = 4,
+		Home_End = 8
 	}
 }

@@ -8,7 +8,7 @@ namespace MlbStatsAcquisition.Model
 {
 	public class HitTrajectoryType : MlbStatsEntity
 	{
-		public int HitTrajectoryTypeID { get; set; }
+		public byte HitTrajectoryTypeID { get; set; }
 		public string Code { get; set; }
 		public string Description { get; set; }
 	}
