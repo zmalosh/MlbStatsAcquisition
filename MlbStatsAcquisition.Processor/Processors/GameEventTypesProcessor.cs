@@ -15,7 +15,6 @@ namespace MlbStatsAcquisition.Processor.Processors
 			var rawJson = JsonUtility.GetRawJsonFromUrl(url);
 			var feed = Feeds.GameEventTypesFeed.FromJson(rawJson);
 
-
 			var dbGameEventTypes = context.GameEventTypes.ToDictionary(x => x.Code);
 			foreach (var feedGameEventType in feed)
 			{

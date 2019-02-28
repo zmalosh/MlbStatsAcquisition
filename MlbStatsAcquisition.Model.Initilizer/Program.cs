@@ -9,7 +9,7 @@ namespace MlbStatsAcquisition.Model.Initilizer
 	class Program
 	{
 		private const int MaxYear = 2018;
-		private const int MinYear = 2017;
+		private const int MinYear = 2010;
 		static void Main(string[] args)
 		{
 			var startTime = DateTime.Now;
@@ -77,6 +77,9 @@ namespace MlbStatsAcquisition.Model.Initilizer
 				{
 					Console.WriteLine($"{gameData.GameTime.ToShortDateString()} - {gameData.GameID} - {gameData.Away?.PadRight(3, ' ')} @ {gameData.Home?.PadRight(3, ' ')}");
 					processor = new Processor.Processors.BoxscoreProcessor(gameData.GameID);
+					processor.Run(context);
+					context = GetNewContext();
+					processor = new Processor.Processors.PlayByPlayProcessor(gameData.GameID);
 					processor.Run(context);
 					context = GetNewContext();
 				}

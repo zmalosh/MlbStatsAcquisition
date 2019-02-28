@@ -11,7 +11,7 @@ namespace MlbStatsAcquisition.Processor.Feeds
 	{
 		public static string GetFeedUrl(int gameId)
 		{
-			return string.Format($"http://statsapi.mlb.com/api/v1/game/{gameId}/boxscore");
+			return string.Format($"http://statsapi.mlb.com/api/v1/game/{gameId}/playByPlay");
 		}
 
 		public static PlayByPlayFeed FromJson(string json) => JsonConvert.DeserializeObject<PlayByPlayFeed>(json, Converter.Settings);
@@ -336,13 +336,13 @@ namespace MlbStatsAcquisition.Processor.Feeds
 			public double? BreakLength { get; set; }
 
 			[JsonProperty("breakY", NullValueHandling = NullValueHandling.Ignore)]
-			public int? BreakY { get; set; }
+			public double? BreakY { get; set; }
 
 			[JsonProperty("spinRate", NullValueHandling = NullValueHandling.Ignore)]
-			public int? SpinRate { get; set; }
+			public double? SpinRate { get; set; }
 
 			[JsonProperty("spinDirection", NullValueHandling = NullValueHandling.Ignore)]
-			public int? SpinDirection { get; set; }
+			public double? SpinDirection { get; set; }
 		}
 
 		public class Position

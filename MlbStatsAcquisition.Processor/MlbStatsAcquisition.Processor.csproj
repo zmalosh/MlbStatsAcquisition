@@ -87,6 +87,7 @@
     <Compile Include="Processors\JobTypesProcessor.cs" />
     <Compile Include="Processors\PitchResultTypesProcessor.cs" />
     <Compile Include="Processors\PitchTypesProcessor.cs" />
+    <Compile Include="Processors\PlayByPlayProcessor.cs" />
     <Compile Include="Processors\PositionsProcessor.cs" />
     <Compile Include="Processors\ReviewReasonTypesProcessor.cs" />
     <Compile Include="Processors\SkyTypesProcessor.cs" />
