@@ -12,6 +12,7 @@ namespace MlbStatsAcquisition.Model.Initilizer
 		private const int MinYear = 2010;
 		static void Main(string[] args)
 		{
+			var startTime = DateTime.Now;
 			var context = GetNewContext();
 
 			Processor.Processors.IProcessor processor;
@@ -82,6 +83,9 @@ namespace MlbStatsAcquisition.Model.Initilizer
 			}
 
 			context.Dispose();
+			var endTime = DateTime.Now;
+			Console.WriteLine($"FIN - {(endTime - startTime).TotalMinutes} MIN");
+			Console.ReadKey();
 		}
 
 		private static MlbStatsContext GetNewContext()
