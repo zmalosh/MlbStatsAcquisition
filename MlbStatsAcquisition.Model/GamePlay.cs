@@ -10,7 +10,7 @@ namespace MlbStatsAcquisition.Model
 	{
 		public int GamePlayID { get; set; }
 		public int GameID { get; set; }
-		public int GamePlayIndex { get; set; }
+		public short GamePlayIndex { get; set; }
 		public byte Inning { get; set; }
 		public int Season { get; set; }
 		public string PlayType { get; set; }
@@ -19,11 +19,10 @@ namespace MlbStatsAcquisition.Model
 		public bool IsInningTop { get; set; }
 		public byte OutsEnd { get; set; }
 		public byte OutsStart { get; set; }
-		public bool IsScoringPlay { get; set; }
 		public bool IsReview { get; set; }
 		public byte Strikes { get; set; }
 		public byte Balls { get; set; }
-		public byte RunsBattedIn { get; set; }
+		public byte RunsScored { get; set; }
 		public byte ScoreHome { get; set; }
 		public byte ScoreAway { get; set; }
 		public int BatterID { get; set; }
@@ -36,8 +35,8 @@ namespace MlbStatsAcquisition.Model
 		public RunnerLocation RunnerStatusStart { get; set; }
 		public RunnerLocation RunnerStatusEnd { get; set; }
 
-		public DateTime StartTime { get; set; }
-		public DateTime EndTime { get; set; }
+		public DateTime? StartTime { get; set; }
+		public DateTime? EndTime { get; set; }
 
 		public virtual Game Game { get; set; }
 		public virtual Player Batter { get; set; }

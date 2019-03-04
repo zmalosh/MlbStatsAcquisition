@@ -58,6 +58,8 @@
     <Compile Include="GamePlayPickoff.cs" />
     <Compile Include="GamePlayPitch.cs" />
     <Compile Include="GamePlayRunner.cs" />
+    <Compile Include="GamePlayFieldingCredit.cs" />
+    <Compile Include="GamePlayFieldingCreditType.cs" />
     <Compile Include="League.cs" />
     <Compile Include="GameEventType.cs" />
     <Compile Include="GameStatusType.cs" />

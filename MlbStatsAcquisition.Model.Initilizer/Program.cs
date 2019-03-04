@@ -9,7 +9,7 @@ namespace MlbStatsAcquisition.Model.Initilizer
 	class Program
 	{
 		private const int MaxYear = 2018;
-		private const int MinYear = 2010;
+		private const int MinYear = 2017;
 		static void Main(string[] args)
 		{
 			var startTime = DateTime.Now;

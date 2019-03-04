@@ -26,6 +26,7 @@ namespace MlbStatsAcquisition.Model
 		public DbSet<WindType> WindTypes { get; set; }
 
 		public DbSet<RefUmpireType> UmpireTypes { get; set; }
+		public DbSet<RefGamePlayFieldingCreditType> GamePlayFieldingCreditTypes { get; set; }
 
 		public DbSet<Venue> Venues { get; set; }
 		public DbSet<Association> Associations { get; set; }
@@ -45,6 +46,7 @@ namespace MlbStatsAcquisition.Model
 		public DbSet<Game> Games { get; set; }
 		public DbSet<GamePlay> GamePlays { get; set; }
 		public DbSet<GamePlayRunner> GamePlayRunners { get; set; }
+		public DbSet<GamePlayFieldingCredit> GamePlayFieldingCredits { get; set; }
 		public DbSet<GamePlayPitch> GamePlayPitches { get; set; }
 		public DbSet<GamePlayAction> GamePlayActions { get; set; }
 		public DbSet<GamePlayPickoff> GamePlayPickoffs { get; set; }
@@ -77,6 +79,9 @@ namespace MlbStatsAcquisition.Model
 
 			modelBuilder.Entity<RefUmpireType>().ToTable("UmpireTypes");
 			modelBuilder.Entity<RefUmpireType>().HasKey(ut => ut.UmpireType).Property(ut => ut.UmpireType).HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
+
+			modelBuilder.Entity<RefGamePlayFieldingCreditType>().ToTable("GamePlayFieldingCreditType");
+			modelBuilder.Entity<RefGamePlayFieldingCreditType>().HasKey(x => x.CreditType).Property(x => x.CreditType).HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
 
 			modelBuilder.Entity<Venue>().HasKey(v => v.VenueID).Property(v => v.VenueID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
 			modelBuilder.Entity<Association>().HasKey(a => a.AssociationID).Property(a => a.AssociationID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
@@ -129,13 +134,15 @@ namespace MlbStatsAcquisition.Model
 			modelBuilder.Entity<GamePlay>().HasRequired(g => g.Batter).WithMany(p => p.BatterPlays).HasForeignKey(g => g.BatterID).WillCascadeOnDelete(false);
 			modelBuilder.Entity<GamePlay>().HasRequired(g => g.Pitcher).WithMany(p => p.PitcherPlays).HasForeignKey(g => g.PitcherID).WillCascadeOnDelete(false);
 
-			modelBuilder.Entity<GamePlayRunner>().HasKey(g => new { g.GamePlayID, g.StartRunnerLocation });
+			modelBuilder.Entity<GamePlayRunner>().HasKey(g => g.GamePlayRunnerID).Property(r => r.GamePlayRunnerID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
 			modelBuilder.Entity<GamePlayRunner>().HasRequired(g => g.GamePlay).WithMany(g => g.Runners).HasForeignKey(g => g.GamePlayID).WillCascadeOnDelete(false);
 			modelBuilder.Entity<GamePlayRunner>().HasRequired(g => g.Runner).WithMany(p => p.PlaysOnBase).HasForeignKey(g => g.RunnerID).WillCascadeOnDelete(false);
 			modelBuilder.Entity<GamePlayRunner>().HasOptional(g => g.PitcherResponsible).WithMany(p => p.PitcherResponsibleRunners).HasForeignKey(g => g.PitcherResponsibleID).WillCascadeOnDelete(false);
-			modelBuilder.Entity<GamePlayRunner>().HasOptional(g => g.Fielder).WithMany(p => p.RunnerOuts_Fielder).HasForeignKey(g => g.FielderID);
-			modelBuilder.Entity<GamePlayRunner>().HasOptional(g => g.Assister).WithMany(p => p.RunnerOuts_Assister).HasForeignKey(g => g.AssisterID);
-			modelBuilder.Entity<GamePlayRunner>().HasOptional(g => g.PutOuter).WithMany(p => p.RunnerOuts_PutOuter).HasForeignKey(g => g.PutOuterID);
+
+			modelBuilder.Entity<GamePlayFieldingCredit>().HasKey(x => x.FieldingCreditID).Property(x => x.FieldingCreditID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
+			modelBuilder.Entity<GamePlayFieldingCredit>().HasRequired(x => x.PlayRunner).WithMany(x => x.FieldingCredits).HasForeignKey(x => x.PlayRunnerID).WillCascadeOnDelete(false);
+			modelBuilder.Entity<GamePlayFieldingCredit>().HasRequired(x => x.Fielder).WithMany(x => x.FieldingCredits).HasForeignKey(x => x.FielderID).WillCascadeOnDelete(false);
+			modelBuilder.Entity<GamePlayFieldingCredit>().HasRequired(x => x.RefCreditType).WithMany(x => x.FieldingCredits).HasForeignKey(x => x.CreditType).WillCascadeOnDelete(false);
 
 			modelBuilder.Entity<GamePlayPitch>().HasKey(p => new { p.GamePlayID, p.GamePlayEventIndex });
 			modelBuilder.Entity<GamePlayPitch>().HasRequired(p => p.GamePlay).WithMany(p => p.Pitches).HasForeignKey(p => p.GamePlayID).WillCascadeOnDelete(false);

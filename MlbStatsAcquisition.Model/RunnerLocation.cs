@@ -9,7 +9,7 @@ namespace MlbStatsAcquisition.Model
 	[Flags]
 	public enum RunnerLocation
 	{
-		Home_Start = 0,
+		None = 0, // Home_Start
 		First = 1,
 		Second = 2,
 		Third = 4,

@@ -50,7 +50,7 @@ namespace MlbStatsAcquisition.Processor.Feeds
 			public List<PlayEvent> PlayEvents { get; set; }
 
 			[JsonProperty("atBatIndex")]
-			public int AtBatIndex { get; set; }
+			public short AtBatIndex { get; set; }
 
 			[JsonProperty("playEndTime")]
 			public DateTimeOffset PlayEndTime { get; set; }
@@ -65,13 +65,13 @@ namespace MlbStatsAcquisition.Processor.Feeds
 			public string HalfInning { get; set; }
 
 			[JsonProperty("inning")]
-			public int Inning { get; set; }
+			public byte Inning { get; set; }
 
 			[JsonProperty("startTime")]
-			public DateTimeOffset StartTime { get; set; }
+			public DateTime? StartTime { get; set; }
 
 			[JsonProperty("endTime")]
-			public DateTimeOffset EndTime { get; set; }
+			public DateTime? EndTime { get; set; }
 
 			[JsonProperty("isComplete")]
 			public bool IsComplete { get; set; }
@@ -375,13 +375,13 @@ namespace MlbStatsAcquisition.Processor.Feeds
 			public string Description { get; set; }
 
 			[JsonProperty("rbi")]
-			public int Rbi { get; set; }
+			public byte Rbi { get; set; }
 
 			[JsonProperty("awayScore")]
-			public int AwayScore { get; set; }
+			public byte AwayScore { get; set; }
 
 			[JsonProperty("homeScore")]
-			public int HomeScore { get; set; }
+			public byte HomeScore { get; set; }
 		}
 
 		public class Runner
@@ -438,7 +438,7 @@ namespace MlbStatsAcquisition.Processor.Feeds
 			public bool TeamUnearned { get; set; }
 
 			[JsonProperty("playIndex")]
-			public int PlayIndex { get; set; }
+			public short PlayIndex { get; set; }
 		}
 
 		public class Movement
@@ -456,7 +456,7 @@ namespace MlbStatsAcquisition.Processor.Feeds
 			public bool? IsOut { get; set; }
 
 			[JsonProperty("outNumber")]
-			public int? OutNumber { get; set; }
+			public byte? OutNumber { get; set; }
 		}
 	}
 
