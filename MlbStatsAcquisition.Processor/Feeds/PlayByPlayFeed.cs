@@ -92,13 +92,13 @@ namespace MlbStatsAcquisition.Processor.Feeds
 		public class Count
 		{
 			[JsonProperty("balls", NullValueHandling = NullValueHandling.Ignore)]
-			public int? Balls { get; set; }
+			public byte Balls { get; set; }
 
 			[JsonProperty("strikes", NullValueHandling = NullValueHandling.Ignore)]
-			public int? Strikes { get; set; }
+			public byte Strikes { get; set; }
 
 			[JsonProperty("outs", NullValueHandling = NullValueHandling.Ignore)]
-			public int? Outs { get; set; }
+			public byte Outs { get; set; }
 		}
 
 		public class Matchup
@@ -174,7 +174,7 @@ namespace MlbStatsAcquisition.Processor.Feeds
 			public PitchData PitchData { get; set; }
 
 			[JsonProperty("index")]
-			public int Index { get; set; }
+			public byte Index { get; set; }
 
 			[JsonProperty("pfxId", NullValueHandling = NullValueHandling.Ignore)]
 			public string PfxId { get; set; }
@@ -183,7 +183,7 @@ namespace MlbStatsAcquisition.Processor.Feeds
 			public Guid? PlayId { get; set; }
 
 			[JsonProperty("pitchNumber", NullValueHandling = NullValueHandling.Ignore)]
-			public int? PitchNumber { get; set; }
+			public byte? PitchNumber { get; set; }
 
 			[JsonProperty("startTime", NullValueHandling = NullValueHandling.Ignore)]
 			public DateTimeOffset? StartTime { get; set; }
@@ -282,7 +282,7 @@ namespace MlbStatsAcquisition.Processor.Feeds
 			public string Hardness { get; set; }
 
 			[JsonProperty("location", NullValueHandling = NullValueHandling.Ignore)]
-			public int? Location { get; set; }
+			public byte? Location { get; set; }
 
 			[JsonProperty("coordinates")]
 			public HitDataCoordinates Coordinates { get; set; }
@@ -315,16 +315,64 @@ namespace MlbStatsAcquisition.Processor.Feeds
 			public double StrikeZoneBottom { get; set; }
 
 			[JsonProperty("coordinates")]
-			public Dictionary<string, double> Coordinates { get; set; }
+			public PitchCoordinates Coordinates { get; set; }
 
 			[JsonProperty("breaks")]
 			public Breaks Breaks { get; set; }
 
 			[JsonProperty("zone", NullValueHandling = NullValueHandling.Ignore)]
-			public int? Zone { get; set; }
+			public byte? Zone { get; set; }
 
 			[JsonProperty("typeConfidence", NullValueHandling = NullValueHandling.Ignore)]
 			public double? TypeConfidence { get; set; }
+		}
+
+		public class PitchCoordinates
+		{
+			[JsonProperty("aY")]
+			public double? A_Y { get; set; }
+
+			[JsonProperty("aZ")]
+			public double? A_Z { get; set; }
+
+			[JsonProperty("pfxX")]
+			public double? PFX_X { get; set; }
+
+			[JsonProperty("pfxZ")]
+			public double? PFX_Z { get; set; }
+
+			[JsonProperty("pX")]
+			public double? P_X { get; set; }
+
+			[JsonProperty("pZ")]
+			public double? P_Z { get; set; }
+
+			[JsonProperty("vX0")]
+			public double? V_X0 { get; set; }
+
+			[JsonProperty("vY0")]
+			public double? V_Y0 { get; set; }
+
+			[JsonProperty("vZ0")]
+			public double? V_Z0 { get; set; }
+
+			[JsonProperty("x")]
+			public double? X { get; set; }
+
+			[JsonProperty("y")]
+			public double? Y { get; set; }
+
+			[JsonProperty("x0")]
+			public double? X0 { get; set; }
+
+			[JsonProperty("y0")]
+			public double? Y0 { get; set; }
+
+			[JsonProperty("z0")]
+			public double? Z0 { get; set; }
+
+			[JsonProperty("aX")]
+			public double? A_X { get; set; }
 		}
 
 		public class Breaks

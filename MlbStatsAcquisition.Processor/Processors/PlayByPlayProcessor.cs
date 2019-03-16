@@ -36,8 +36,15 @@ namespace MlbStatsAcquisition.Processor.Processors
 					}
 					int season = dbGame.Season;
 
+					var dbTrajectoriesDict = context.HitTrajectoryTypes.ToDictionary(x => x.Code, y => y.HitTrajectoryTypeID);
+					var dbPitchResultsDict = context.PitchResultTypes.ToDictionary(x => x.Code, y => y.PitchResultTypeID);
+					var dbPitchTypesDict = context.PitchTypes.ToDictionary(x => x.Code, y => y.PitchTypeID);
+
 					var dbPlaysDict = context.GamePlays.Where(x => x.GameID == dbGame.GameID).ToDictionary(x => x.GamePlayIndex);
 					var dbPlayRunnersLookup = context.GamePlayRunners.Include("FieldingCredits").Where(x => x.GamePlay.GameID == dbGame.GameID).ToLookup(x => x.PlayIndex);
+					var dbPlayPitchesLookup = context.GamePlayPitches.Where(x => x.GamePlay.GameID == dbGame.GameID).ToLookup(x => x.GamePlay.GamePlayIndex).ToDictionary(x => x.Key, y => y.ToDictionary(z => (int)z.GamePlayEventIndex, z => z));
+					var dbPlayActionsLookup = context.GamePlayActions.Where(x => x.GamePlay.GameID == dbGame.GameID).ToLookup(x => x.GamePlay.GamePlayIndex).ToDictionary(x => x.Key, y => y.ToDictionary(z => (int)z.GamePlayEventIndex, z => z));
+					var dbPlayPickoffsLookup = context.GamePlayPickoffs.Where(x => x.GamePlay.GameID == dbGame.GameID).ToLookup(x => x.GamePlay.GamePlayIndex).ToDictionary(x => x.Key, y => y.ToDictionary(z => (int)z.GamePlayEventIndex, z => z));
 
 					var feedPlayers = feed.AllPlays.Where(x => x.Matchup?.Pitcher != null && x.Matchup?.Batter != null)
 													.SelectMany(x => new[]{
@@ -129,20 +136,20 @@ namespace MlbStatsAcquisition.Processor.Processors
 							isUpdate = CheckPlayForUpdate(feedPlay, dbPlay, outCount, startRunners, endRunners);
 						}
 
+						var feedPitcher = feedPlay.Matchup.Pitcher;
+						if (feedPitcher != null && (pitcher == null || pitcher.PlayerID != feedPitcher.Id))
+						{
+							pitcher = dbPlayersDict[feedPitcher.Id];
+						}
+
+						var feedBatter = feedPlay.Matchup.Batter;
+						if (!dbPlayersDict.TryGetValue(feedBatter.Id, out Player batter))
+						{
+							batter = dbPlayersDict[feedPlay.Matchup.Batter.Id];
+						}
+
 						if (isNew || isUpdate)
 						{
-							var feedPitcher = feedPlay.Matchup.Pitcher;
-							if (pitcher == null || pitcher.PlayerID != feedPitcher.Id)
-							{
-								pitcher = dbPlayersDict[feedPitcher.Id];
-							}
-
-							var feedBatter = feedPlay.Matchup.Batter;
-							if (!dbPlayersDict.TryGetValue(feedBatter.Id, out Player batter))
-							{
-								batter = dbPlayersDict[feedPlay.Matchup.Batter.Id];
-							}
-
 							dbPlay.StartTime = feedPlay.About.StartTime;
 							dbPlay.EndTime = feedPlay.About.EndTime;
 							dbPlay.IsReview = feedPlay.About.HasReview;
@@ -260,6 +267,120 @@ namespace MlbStatsAcquisition.Processor.Processors
 											}
 										}
 									}
+								}
+							}
+						}
+
+						var dbPlayPitchesDict = dbPlayPitchesLookup.ContainsKey(playIndex) ? dbPlayPitchesLookup[playIndex] : null;
+						var dbPlayActionsDict = dbPlayActionsLookup.ContainsKey(playIndex) ? dbPlayActionsLookup[playIndex] : null;
+						var dbPlayPickoffsDict = dbPlayPickoffsLookup.ContainsKey(playIndex) ? dbPlayPickoffsLookup[playIndex] : null;
+						var feedPlayEvents = feedPlay.PlayEvents;
+						if (feedPlayEvents != null && feedPlayEvents.Count > 0)
+						{
+							foreach (var feedPlayEvent in feedPlayEvents)
+							{
+								if (string.Equals(feedPlayEvent.Type, "pitch", StringComparison.InvariantCultureIgnoreCase))
+								{
+									bool isNewPitch = false;
+									if (dbPlayPitchesDict == null || !dbPlayPitchesDict.TryGetValue(feedPlayEvent.Index, out GamePlayPitch dbPitch))
+									{
+										isNewPitch = true;
+										dbPitch = new GamePlayPitch
+										{
+											Batter = batter,
+											BatterID = batter.PlayerID,
+											Pitcher = pitcher,
+											PitcherID = pitcher.PlayerID,
+											GamePlay = dbPlay,
+											GamePlayID = dbPlay.GamePlayID,
+											GamePlayEventIndex = feedPlayEvent.Index,
+											MlbPlayID = feedPlayEvent.PlayId,
+											PfxId = feedPlayEvent.PfxId
+										};
+										context.GamePlayPitches.Add(dbPitch);
+									}
+
+									bool isUpdatedPitch = false;
+									// TODO: CHECK FOR UPDATES TO PITCH
+
+									if (isNewPitch || isUpdatedPitch)
+									{
+										dbPitch.PitchNumber = feedPlayEvent.PitchNumber;
+
+										dbPitch.Balls = feedPlayEvent.Count?.Balls;
+										dbPitch.Strikes = feedPlayEvent.Count?.Strikes;
+										dbPitch.Outs = feedPlayEvent.Count?.Outs;
+
+										dbPitch.StartSpeed = feedPlayEvent.PitchData?.StartSpeed;
+										dbPitch.StrikeZoneBottom = feedPlayEvent.PitchData?.StrikeZoneBottom;
+										dbPitch.StrikeZoneTop = feedPlayEvent.PitchData?.StrikeZoneTop;
+										dbPitch.EndSpeed = feedPlayEvent.PitchData?.EndSpeed;
+										dbPitch.NastyFactor = feedPlayEvent.PitchData?.NastyFactor;
+
+										dbPitch.P_A_X = feedPlayEvent.PitchData?.Coordinates.A_X;
+										dbPitch.P_A_Y = feedPlayEvent.PitchData?.Coordinates.A_Y;
+										dbPitch.P_A_Z = feedPlayEvent.PitchData?.Coordinates.A_Z;
+										dbPitch.P_PFX_X = feedPlayEvent.PitchData?.Coordinates.PFX_X;
+										dbPitch.P_PFX_Z = feedPlayEvent.PitchData?.Coordinates.PFX_Z;
+										dbPitch.P_P_X = feedPlayEvent.PitchData?.Coordinates.P_X;
+										dbPitch.P_P_Z = feedPlayEvent.PitchData?.Coordinates.P_Z;
+										dbPitch.P_V_X0 = feedPlayEvent.PitchData?.Coordinates.V_X0;
+										dbPitch.P_V_Y0 = feedPlayEvent.PitchData?.Coordinates.V_Y0;
+										dbPitch.P_V_Z0 = feedPlayEvent.PitchData?.Coordinates.V_Z0;
+										dbPitch.P_X = feedPlayEvent.PitchData?.Coordinates.X;
+										dbPitch.P_X0 = feedPlayEvent.PitchData?.Coordinates.X0;
+										dbPitch.P_Y = feedPlayEvent.PitchData?.Coordinates.Y;
+										dbPitch.P_Y0 = feedPlayEvent.PitchData?.Coordinates.Y0;
+										dbPitch.P_Z0 = feedPlayEvent.PitchData?.Coordinates.Z0;
+
+										dbPitch.P_BreakAngle = feedPlayEvent.PitchData?.Breaks?.BreakAngle;
+										dbPitch.P_BreakLength = feedPlayEvent.PitchData?.Breaks?.BreakLength;
+										dbPitch.P_Break_Y = feedPlayEvent.PitchData?.Breaks?.BreakY;
+										dbPitch.P_SpinDirection = feedPlayEvent.PitchData?.Breaks?.SpinDirection;
+										dbPitch.P_SpinRate = feedPlayEvent.PitchData?.Breaks?.SpinRate;
+
+										dbPitch.P_Zone = feedPlayEvent.PitchData?.Zone;
+										dbPitch.P_TypeConfidence = feedPlayEvent.PitchData?.TypeConfidence;
+
+										dbPitch.H_Coord_X = feedPlayEvent.HitData?.Coordinates?.CoordX;
+										dbPitch.H_Coord_Y = feedPlayEvent.HitData?.Coordinates?.CoordY;
+
+										dbPitch.H_Hardness = feedPlayEvent.HitData?.Hardness;
+										dbPitch.H_LaunchAngle = feedPlayEvent.HitData?.LaunchAngle;
+										dbPitch.H_LaunchSpeed = feedPlayEvent.HitData?.LaunchSpeed;
+										dbPitch.H_TotalDistance = feedPlayEvent.HitData?.TotalDistance;
+										dbPitch.H_Location = feedPlayEvent.HitData?.Location;
+
+										dbPitch.HasReview = feedPlayEvent.Details?.HasReview;
+										dbPitch.IsBall = feedPlayEvent.Details?.IsBall;
+										dbPitch.IsInPlay = feedPlayEvent.Details?.IsInPlay;
+										dbPitch.IsStrike = feedPlayEvent.Details?.IsStrike;
+
+										dbPitch.TimeSec = feedPlayEvent.StartTime.HasValue && feedPlayEvent.EndTime.HasValue
+															? (short?)(feedPlayEvent.EndTime.Value - feedPlayEvent.StartTime.Value).TotalSeconds
+															: null;
+
+										var trajectoryKey = feedPlayEvent.HitData?.Trajectory;
+										dbPitch.H_TrajectoryTypeID = (!string.IsNullOrEmpty(trajectoryKey) && dbTrajectoriesDict.TryGetValue(trajectoryKey, out byte b1)) ? b1 : (byte?)null;
+
+										var pitchResultKey = feedPlayEvent.Details?.Code;
+										dbPitch.PitchResultTypeID = (!string.IsNullOrEmpty(pitchResultKey) && dbPitchResultsDict.TryGetValue(pitchResultKey, out byte b2)) ? b2 : (byte?)null;
+
+										var pitchTypeKey = feedPlayEvent?.Details?.Type?.Code;
+										dbPitch.PitchTypeID = (!string.IsNullOrEmpty(pitchTypeKey) && dbPitchTypesDict.TryGetValue(pitchTypeKey, out byte b3)) ? b3 : (byte?)null;
+									}
+								}
+								else if (string.Equals(feedPlayEvent.Type, "action", StringComparison.InvariantCultureIgnoreCase))
+								{
+
+								}
+								else if (string.Equals(feedPlayEvent.Type, "pickoff", StringComparison.InvariantCultureIgnoreCase))
+								{
+
+								}
+								else
+								{
+									throw new ArgumentException("UNEXPECTED PLAY EVENT TYPE");
 								}
 							}
 						}

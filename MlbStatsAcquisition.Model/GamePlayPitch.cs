@@ -10,18 +10,18 @@ namespace MlbStatsAcquisition.Model
 	{
 		public int GamePlayID { get; set; }
 		public byte GamePlayEventIndex { get; set; }
-		public byte PitchNumber { get; set; }
+		public byte? PitchNumber { get; set; }
 		public int PitcherID { get; set; }
 		public int BatterID { get; set; }
-		public byte Balls { get; set; }
-		public byte Strikes { get; set; }
-		public byte Outs { get; set; }
-		public byte PitchResultTypeID { get; set; }
-		public byte PitchTypeID { get; set; }
-		public bool IsInPlay { get; set; }
-		public bool IsStrike { get; set; }
-		public bool IsBall { get; set; }
-		public bool HasReview { get; set; }
+		public byte? Balls { get; set; }
+		public byte? Strikes { get; set; }
+		public byte? Outs { get; set; }
+		public byte? PitchResultTypeID { get; set; }
+		public byte? PitchTypeID { get; set; }
+		public bool? IsInPlay { get; set; }
+		public bool? IsStrike { get; set; }
+		public bool? IsBall { get; set; }
+		public bool? HasReview { get; set; }
 		public short? TimeSec { get; set; }
 		public double? StartSpeed { get; set; }
 		public double? EndSpeed { get; set; }
@@ -45,20 +45,21 @@ namespace MlbStatsAcquisition.Model
 		public double? P_Z0 { get; set; }
 		public double? P_BreakAngle { get; set; }
 		public double? P_BreakLength { get; set; }
-		public double? P_Break_y { get; set; }
+		public double? P_Break_Y { get; set; }
 		public double? P_SpinRate { get; set; }
 		public double? P_SpinDirection { get; set; }
-		public byte? P_TypeConfidence { get; set; }
+		public double? P_TypeConfidence { get; set; }
 		public byte? P_Zone { get; set; }
 		public double? H_LaunchSpeed { get; set; }
 		public double? H_LaunchAngle { get; set; }
 		public double? H_TotalDistance { get; set; }
 		public byte? H_TrajectoryTypeID { get; set; }
 		public string H_Hardness { get; set; }
-		public byte H_Location { get; set; }
+		public byte? H_Location { get; set; }
 		public double? H_Coord_X { get; set; }
 		public double? H_Coord_Y { get; set; }
-		public Guid MlbPlayID { get; set; }
+		public Guid? MlbPlayID { get; set; }
+		public string PfxId { get; set; }
 
 		public virtual GamePlay GamePlay { get; set; }
 		public virtual Player Batter { get; set; }
